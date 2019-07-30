@@ -1,6 +1,15 @@
 # nat-selection
 This is a recreation of the natural selection simulation demonstrated in a [youtube video](https://www.youtube.com/watch?v=0ZGbIKd0XrM) by Primer. Primer has his own [github repository](https://github.com/Helpsypoo/primer), but none of his code was used here. The idea was to copy the simulation "rules" set out in the video and independently recreate it in C++. The code does not animate the simulation but uses gnuplot, via the [gnuplot-iostream api](https://github.com/dstahlke/gnuplot-iostream), to produce plots of how the population number and traits changed.
 
+#### **Example Graphs**
+
+ <img align="left" src="/example-graphs/AverageChange.png" alt="Average change plot for a single simulation" title="Average change plot for a single simulation" width="416"  /> 
+ <img align="right" src="/example-graphs/AverageChange_10runs.png" alt="Average change plot for 10 repeat simulation runs" title="Average change plot for 10 repeat simulation runs" width="416" />
+ \
+<p align="center">
+<img align="center" src="/example-graphs/StatDistribution_Sim0.gif" alt="Trait distribution for a given simulation" title="Trait distribution for a given simulation" width="500">
+ </p>
+
 #### **Simulation Rules** 
 The simulation creates a squared grid "map", with "blob" creatures living at the edges, and randomly populates it with "food". Each day the blob creatures leave home to hunt for food. If a blob eats one food object and makes it home, it will survive to the next day. If a blob eats two "food" and makes it home then they reproduce asexually. Each blob has three traits to help it hunt food:
  - Size - A blob can eat another blob so long as the prey is 20% smaller than it.
