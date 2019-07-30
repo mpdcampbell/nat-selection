@@ -5,9 +5,8 @@ This is a recreation of the natural selection simulation demonstrated in a [yout
 
  <img align="left" src="/example-graphs/AverageChange.png" alt="Average change plot for a single simulation" title="Average change plot for a single simulation" width="416"  /> 
  <img align="right" src="/example-graphs/AverageChange_10runs.png" alt="Average change plot for 10 repeat simulation runs" title="Average change plot for 10 repeat simulation runs" width="416" />
- \
 <p align="center">
-<img align="center" src="/example-graphs/StatDistribution_Sim0.gif" alt="Trait distribution for a given simulation" title="Trait distribution for a given simulation" width="500">
+<img align="center" src="/example-graphs/StatDistribution_Sim0.gif" alt="Trait distribution for a given simulation" title="Trait distribution for a given simulation" width="500"><br \>
  </p>
 
 #### **Simulation Rules** 
