@@ -9,22 +9,21 @@
 extern int g_mutationProb{ 10 };
 
 Blob::Blob()
-	: m_nativeEnergy{ 1800.0 }, m_size{ 3.0 }, m_speed{ 3.0 }, m_sense{ 3.0 }
+	: m_nativeEnergy{ 1800.0 }, m_size{ 3.0 }, m_speed{ 3.0 }, m_sense{ 3.0 }, m_birthday{ 0 }
 {
 }
-
 
 Blob::Blob(double nativeEnergy, double size, double speed, double sense)
 	: m_nativeEnergy{ nativeEnergy }, m_size{ size }, m_speed{ speed }, m_sense{ sense }
 {
 }
 
-std::string Blob::getName()
+int Blob::getName()
 {
 	return m_name;
 }
 
-void Blob::setName(std::string name)
+void Blob::setName(int name)
 {
 	m_name = name;
 }
@@ -95,19 +94,30 @@ void Blob::setFoodEaten(int x)
 	m_foodEaten = x;
 }
 
-int Blob::getAge()
+int Blob::getBirthday()
 {
-	return m_age;
+	return m_birthday;
 }
 
-void Blob::setAge(int x)
+void Blob::setBirthday(int day)
 {
-	m_age = x;
+	m_birthday = day;
 }
 
 void Blob::sleep()
 {
 	m_energy = m_nativeEnergy;
+}
+
+std::vector<std::array<int, 2>> Blob::getPath()
+{
+	return m_path;
+}
+
+void Blob::recordPath()
+{
+	std::array<int, 2> position{ m_xPosition, m_yPosition };
+	m_path.push_back(position);
 }
 
 /*Using convention that North and East are +ve and 
@@ -191,7 +201,7 @@ bool Blob::atFood(Food &food)
 	return false;
 }
 
-std::optional<int> Blob::huntOrRun(std::vector<Food> &foodArray, std::vector<Blob> &blobArray)
+std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray)
 {
 	std::optional<int> predOpt = lookForPredator(blobArray);
 	std::optional<int> foodOpt = lookForFood(foodArray);
@@ -233,8 +243,11 @@ std::optional<int> Blob::huntOrRun(std::vector<Food> &foodArray, std::vector<Blo
 	}
 	else if (preyDist == 0) //if ontop of prey
 	{
-		//erase that blob element
 		auto it = blobArray.begin();
+		//copy deadBlob to deadBlobArray for animation
+		Blob deadBlob = *(it+ preyOpt.value());
+		deadBlobArray.push_back(deadBlob);
+		//erase that blob element
 		blobArray.erase(it + preyOpt.value());
 		setFoodEaten(getFoodEaten() + 1);
 		return preyOpt.value();
@@ -563,7 +576,6 @@ std::optional<Blob> Blob::tryToReplicate()
 		Blob child = *this;
 		/*would prefer a mutated child was born rather than a
 		clone made and then mutated.*/
-		child.setAge(0);
 		child.mutate();
 		return child;
 	}

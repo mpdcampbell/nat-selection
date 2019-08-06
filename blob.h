@@ -5,6 +5,7 @@
 #include <string>
 #include <optional>
 #include <vector>
+#include <array>
 #include "thing.h"
 #include "food.h"
 
@@ -13,23 +14,26 @@ extern int g_mutationProb;
 class Blob : public Thing
 {
 protected:
+	std::vector<std::array<int, 2>> m_path;
 	double m_nativeEnergy;
 	double m_energy = m_nativeEnergy;
 	double m_sense;
 	double m_speed;
 	double m_size;
 	int m_foodEaten = 0;
-	int m_age;
 	int m_mapSize;
+	int m_name;
+	int m_birthday;
 
 public:
+
 	Blob();
 
 	Blob(double nativeEnergy, double size, double speed, double sense);
 
-	std::string getName();
+	int getName();
 
-	void setName(std::string name);
+	void setName(int name);
 
 	double getSense();
 
@@ -57,9 +61,13 @@ public:
 
 	void setFoodEaten(int x);
 
-	int getAge();
+	int getBirthday();
 
-	void setAge(int x);
+	void setBirthday(int day);
+
+	std::vector<std::array<int,2>> getPath();
+
+	void recordPath();
 
 	void sleep();
 
@@ -79,7 +87,8 @@ public:
 
 	bool atFood(Food &food);
 
-	std::optional<int> huntOrRun(std::vector<Food> &foodArray, std::vector<Blob> &blobArray);
+	std::optional<int> huntOrRun(std::vector<Blob> &blobArray, 
+		std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray);
 	
 	int distToObject(Thing &object);
 

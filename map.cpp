@@ -78,9 +78,8 @@ std::vector<Blob> Map::populateBlobs(Blob &blob, int amount)
 	blob.setMapSize(m_size);
 	for (int i{ 0 }; i < amount; ++i)
 	{
-		std::string name = ("Blob #" + std::to_string(i + 1));
 		std::array<int, 2> xy{ getEdgePosition() };
-		blob.setName(name);
+		blob.setName(i+1);
 		blob.setPosition(xy[0], xy[1]);
 		blobArray.push_back(blob);
 	}

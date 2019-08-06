@@ -12,6 +12,10 @@
 #include "simulationResults.h"
 #include "graphs.h"
 #include "simulation.h"
+#include "animation.h"
+
+#define OLC_PGE_APPLICATION
+#include "olcPixelGameEngine.h"
 
 int main()
 {
@@ -20,6 +24,7 @@ int main()
 
 	Map map;
 	std::vector<Blob> blobArray;
+	std::vector<Blob> deadBlobArray;
 	std::vector<Food> foodArray;
 	simulationResults stats;
 	
@@ -30,17 +35,19 @@ int main()
 	double seedSense{ 3.0 }; 
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
-	//SIMULATION VARIABLES
-	g_mutationProb = 20; //Int Probability of a blob stat mutating during replication
-	map.setMapSize(30); // Int length, in grid spaces, of one side of the square map
+	//ENVIRONMENT VARIABLES
+	map.setMapSize(30); // integer length, in grid spaces, of one side of the square map
 	int seedBlobCount{ 40 }; //starting number of Blobs
-	int foodCount{80}; // number of food pieces place randomly on map daily
-	int dayCount{1000}; // length of simulation in days
-	int simCount{6}; // number of repeat simulations run
+	int foodCount{ 80 }; // number of food pieces place randomly on map daily
+
+	//SIMULATION VARIABLES
+	g_mutationProb = 20; //integer probability of a blob stat mutating during replication
+	int dayCount{200}; // length of simulation in days
+	int simCount{1}; // number of repeat simulations run
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
 	{
-		g_nameHolder = seedBlobCount; //For specific blob naming, allows error tracking
+		g_nameHolder = seedBlobCount+1; //For specific blob naming, allows error tracking
 		blobArray = map.populateBlobs(seedBlob, seedBlobCount);
 		foodArray = map.populateFood(foodCount);
 
@@ -54,7 +61,10 @@ int main()
 				break;
 			}
 			stats.recordDay(blobArray);
-			blobsCarryOutDay(blobArray, foodArray);
+			walkAndEat(blobArray, deadBlobArray, foodArray);
+			naturalSelection(blobArray, deadBlobArray);
+			breed(blobArray, day);
+			digestAndSleep(blobArray);
 			foodArray = map.populateFood(foodCount);
 		}
 		stats.recordSim();
@@ -62,10 +72,24 @@ int main()
 	
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day 
-	
+
+	std::vector<Blob> allBlobs{ combineBlobArrays(blobArray, deadBlobArray) };
+
+	BlobSim demo{ map.getMapSize(), allBlobs };
+	uint32_t screenHeight{ 612 };
+	uint32_t screenWidth{ screenHeight };
+
+	if (demo.Construct(screenWidth, screenHeight, 1, 1))
+	{
+		demo.Start();
+	}
+
+
 	int firstSim{ 0 }, lastSim{ 0 }; //Which simulation runs to create histogram gifs for
 	
 	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
+
+	//system("pause");
 
 	return 0;
 }

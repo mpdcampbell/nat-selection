@@ -192,7 +192,7 @@ void makeHistogram(simulationResults &stats, int firstSim, int lastSim)
 {
 	assert(lastSim >= firstSim && "Value of firstSim is greater than lastSim");
 
-	std::cout << "Making animated histogram of each stats population distrubution...\n";
+	std::cout << "Making animated histogram of each stats population distribution...\n";
 
 	//Get maximum values for x ranges and y range
 	double maxPop = 0;
