@@ -8,26 +8,14 @@
 #include "olcPixelGameEngine.h"
 #include "animation.h"
 
-bool sortByName(Blob &x, Blob &y)
-{
-	return (x.getName()) < (y.getName());
-}
-
-std::vector<Blob> combineBlobArrays(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray)
-{
-	std::vector<Blob> allBlobs{ blobArray };
-	allBlobs.insert(allBlobs.end(), deadBlobArray.begin(), deadBlobArray.end());
-	std::sort(allBlobs.begin(), allBlobs.end(), sortByName);
-	return allBlobs;
-}
-
-	BlobSim::BlobSim()
+/*
+	Animation::Animation()
 	{
 		sAppName = "Natural Selection Simulation";
 	}
 	
-	BlobSim::BlobSim(int cellCount, std::vector<Blob> &allBlobs)
-		: m_cellCount{ cellCount }, m_allBlobs{ allBlobs }
+	Animation::Animation(int cellCount, std::vector<std::vector<std::array<int, 2>>> &eachDaysSteps)
+		: m_cellCount{ cellCount }, m_eachDaysSteps{ eachDaysSteps }
 	{
 
 	}
@@ -37,9 +25,9 @@ std::vector<Blob> combineBlobArrays(std::vector<Blob> &blobArray, std::vector<Bl
 	{
 		m_allBlobs = allBlobs;
 	}
-	*/
+	
 
-	bool BlobSim::OnUserCreate()
+	bool Animation::OnUserCreate()
 	{
 		nBorderWidth = 1;
 		nMapWidth = m_cellCount;
@@ -48,7 +36,7 @@ std::vector<Blob> combineBlobArrays(std::vector<Blob> &blobArray, std::vector<Bl
 		return true;
 	}
 
-	void BlobSim::playAnimation()
+	bool Animation::playAnimation()
 	{
 		int day{ 0 };
 		do {
@@ -62,9 +50,10 @@ std::vector<Blob> combineBlobArrays(std::vector<Blob> &blobArray, std::vector<Bl
 						std::vector<std::array<int, 2>> path{ it->getPath() };
 						if (step <= it->getSpeed())
 						{
-							std::array<int, 2> position{ path[day][step] };
+							//std::array<int, 2> position{ path[day][step] };
+							std::array<int, 2> position{ path[step] };
 							olc::Pixel blue_50{ 0, 0, 255, 128 };
-							FillRect(position[0], position[1], m_cellSize - nBorderWidth, m_cellSize - nBorderWidth, blue_50);
+							FillRect(position[0]*m_cellSize, position[1] * m_cellSize, m_cellSize - nBorderWidth, m_cellSize - nBorderWidth, blue_50);
 							stepTaken = true;
 						}
 						if (path.size() == day)
@@ -75,19 +64,21 @@ std::vector<Blob> combineBlobArrays(std::vector<Blob> &blobArray, std::vector<Bl
 						{
 							++it;
 						}
+					
 					}
 					else
 					{
 						++it;
 					}
 				}
+				//return true;
 				++step;
 			} while (stepTaken);
 			++day;
 		} while (m_allBlobs.size() > 0);
 	}
 
-	bool BlobSim::OnUserUpdate(float fElapsedTime) 
+	bool Animation::OnUserUpdate(float fElapsedTime)
 	{
 		if (GetKey(olc::Key::SPACE).bHeld)
 		{
@@ -107,8 +98,9 @@ std::vector<Blob> combineBlobArrays(std::vector<Blob> &blobArray, std::vector<Bl
 				FillRect(x * m_cellSize, y * m_cellSize, m_cellSize - nBorderWidth, m_cellSize - nBorderWidth, olc::WHITE);
 			}
 		}
-		playAnimation();
+		return (playAnimation());
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		return true;
 	}
 
+	*/

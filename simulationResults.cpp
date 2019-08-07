@@ -1,7 +1,18 @@
 #include <array>
 #include <vector>
+#include <iostream>
+#include <algorithm>
 #include "blob.h"
 #include "simulationResults.h"
+
+bool sortByName(Blob &x, Blob &y)
+{
+	return (x.getName()) < (y.getName());
+}
+
+simulationResults::simulationResults()
+{
+}
 
 void simulationResults::recordAvgBlobStats(std::vector<Blob> &blobArray)
 {
@@ -71,10 +82,75 @@ void simulationResults::recordEachBlobStats(std::vector<Blob> &blobArray)
 	m_eachBlobStats.push_back(dayVector);
 }
 
-void simulationResults::recordDay(std::vector<Blob> &blobArray)
+std::vector<Blob> simulationResults::combineBlobArrays(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray)
+{
+	std::vector<Blob> allBlobs{ blobArray };
+	allBlobs.insert(allBlobs.end(), deadBlobArray.begin(), deadBlobArray.end());
+	std::sort(allBlobs.begin(), allBlobs.end(), &sortByName);
+	return allBlobs;
+}
+
+void simulationResults::recordDaysSteps(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray)
+{
+	//Sort Blobs into original walking order, by using name
+	std::vector<Blob> allBlobs{combineBlobArrays(blobArray, deadBlobArray) };
+	int length{ static_cast<int>(allBlobs.size()) };
+	bool finished;
+	do
+	{
+		finished = true;
+		for (int i{ 0 }; i<length;++i)
+		{
+			int speed = allBlobs[i].getSpeed();
+			std::vector<std::array<int,2>>& path = allBlobs[i].getPath();
+
+			//If the blob has recorded positions in the path
+			if (path.size() >= speed)
+			{
+				if (allBlobs[i].getName() == 12)
+				{
+					std::cout << "Blob #" << allBlobs[i].getName() << " has a path size of " << path.size() << "\n";
+				}
+				/*iterate from first position to the nth position where n is the
+				number of steps that blob may take per turn. Erasing each position from
+				the blobs recorded path, after copying its value onto a seperate vector*/
+				int n{ 0 };
+				finished = false;
+				for (auto it = path.begin(); it != path.end();)
+				{
+					m_daysSteps.push_back(*it);
+					it = (path.erase(it));
+					++n;
+					if (n >= speed)
+					{
+						it = path.end();
+					}
+				}
+			}
+			else
+			{
+			//	std::cout << "Path size successfully reduced to " << path.size() << "\n";
+			}
+		}
+
+	} while (!finished);
+
+	m_eachDaysSteps.push_back(m_daysSteps);
+	m_daysSteps.clear();
+	//erase deadBlobs as no longer needed and to prevent repeat recording of blobs
+	deadBlobArray.clear();
+	length = blobArray.size();
+	for (int i{ 0 }; i < length; ++i)
+	{
+		blobArray[i].getPath().clear();
+	}
+}
+
+void simulationResults::recordDay(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray)
 {
 	recordAvgBlobStats(blobArray);
 	recordEachBlobStats(blobArray);
+	recordDaysSteps(blobArray, deadBlobArray);
 }
 
 void simulationResults::recordSim()
@@ -103,4 +179,14 @@ std::vector< std::vector<std::array<double, 10>>> simulationResults::getManySimA
 std::vector<std::vector<std::vector<std::vector<double>>>> simulationResults::getManySimEach()
 {
 	return m_manySimEach;
+}
+
+std::vector<std::array<int, 2>> simulationResults::getDaysSteps()
+{
+	return m_daysSteps;
+}
+
+std::vector<std::vector<std::array<int, 2>>> simulationResults::getEachDaysSteps()
+{
+	return m_eachDaysSteps;
 }

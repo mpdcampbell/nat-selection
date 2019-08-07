@@ -10,14 +10,10 @@
 #include "blob.h"
 #include "olcPixelGameEngine.h"
 
-bool sortByName(Blob &x, Blob &y);
-
-std::vector<Blob> combineBlobArrays(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray);
-
-class BlobSim : public olc::PixelGameEngine
+class Animation : public olc::PixelGameEngine
 {
 public:
-	BlobSim();
+	Animation();
 
 private:
 	int nMapWidth;
@@ -26,11 +22,11 @@ private:
 	int m_cellSize;
 	int nBorderWidth;
 	int cellPos = 1;
-	std::vector<Blob> m_allBlobs;
+	std::vector<std::vector<std::array<int, 2>>> m_eachDaysSteps;
 	std::vector<Food> foodArray;
 
 public:
-	BlobSim(int cellCount, std::vector<Blob> &allBlobs);
+	Animation(int cellCount, std::vector<std::vector<std::array<int,2>>> &eachDaysSteps);
 
 	/*
 	void setBlobArray(std::vector<Blob> &allBlobs)
@@ -41,7 +37,7 @@ public:
 
 	bool OnUserCreate() override;
 
-	void playAnimation();
+	bool playAnimation();
 
 	bool OnUserUpdate(float fElapsedTime) override;
 };

@@ -60,7 +60,7 @@ int main()
 				std::cout << "Extinction on day " << day << "\n";
 				break;
 			}
-			stats.recordDay(blobArray);
+			stats.recordDay(blobArray, deadBlobArray);
 			walkAndEat(blobArray, deadBlobArray, foodArray);
 			naturalSelection(blobArray, deadBlobArray);
 			breed(blobArray, day);
@@ -73,8 +73,9 @@ int main()
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day 
 
-	std::vector<Blob> allBlobs{ combineBlobArrays(blobArray, deadBlobArray) };
+	std::cout << "Day Count: " << dayCount << ", Days recorded in vector: " << stats.getEachDaysSteps().size() << "\n";
 
+	/*
 	BlobSim demo{ map.getMapSize(), allBlobs };
 	uint32_t screenHeight{ 612 };
 	uint32_t screenWidth{ screenHeight };
@@ -88,8 +89,7 @@ int main()
 	int firstSim{ 0 }, lastSim{ 0 }; //Which simulation runs to create histogram gifs for
 	
 	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
-
-	//system("pause");
-
+	*/
+	system("pause");
 	return 0;
 }
