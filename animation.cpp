@@ -1,3 +1,5 @@
+/*
+
 #include <vector>
 #include <array>
 #include <algorithm>
@@ -5,37 +7,27 @@
 #include <thread>         // std::this_thread::sleep_for
 #include <chrono>
 #include "blob.h"
-//#include "olcPixelGameEngine.h"
 #include "animation.h"
 
-/*
-	Animation::Animation()
-	{
-		sAppName = "Natural Selection Simulation";
-	}
+Animation::Animation()
+{
+	m_sAppName = L"Natural Selection Simulation";
+}
 	
-	Animation::Animation(int cellCount, std::vector<std::vector<std::array<int, 2>>> &eachDaysSteps)
-		: m_cellCount{ cellCount }, m_eachDaysSteps{ eachDaysSteps }
+	Animation::Animation(int cellCount, std::vector<std::vector<Food>> &eachFoodPositions)
+		: m_cellCount{ cellCount }, m_eachFoodPositions{ eachFoodPositions }
 	{
 
 	}
-
-	/*
-	void setBlobArray(std::vector<Blob> &allBlobs)
-	{
-		m_allBlobs = allBlobs;
-	}
-	
 
 	bool Animation::OnUserCreate()
 	{
-		nBorderWidth = 1;
-		nMapWidth = m_cellCount;
-		nMapHeight = m_cellCount;
-		m_cellSize = ScreenWidth() / m_cellCount;
+		m_day = 0;
 		return true;
 	}
 
+
+	/*
 	bool Animation::playAnimation()
 	{
 		int day{ 0 };
@@ -77,30 +69,35 @@
 			++day;
 		} while (m_allBlobs.size() > 0);
 	}
-
+	*/
+/*
 	bool Animation::OnUserUpdate(float fElapsedTime)
 	{
-		if (GetKey(olc::Key::SPACE).bHeld)
+
+		if (m_keys[VK_SPACE].bHeld)
 		{
 			return true;
 		}
 
-		// Draw Map
-		Clear(olc::BLACK);
+		//Draw grid hopefully
 
-		for (int x = 0; x < nMapWidth; x++)
+		for (int x = 0; x < m_cellCount; x++)
 		{
-			for (int y = 0; y < nMapHeight; y++)
+			for (int y = 0; y < m_cellCount; y++)
 			{
 				//olc::Pixel colour = olc::BLUE;
 
 				// Draw Base
-				FillRect(x * m_cellSize, y * m_cellSize, m_cellSize - nBorderWidth, m_cellSize - nBorderWidth, olc::WHITE);
+				Draw(x, y, PIXEL_SOLID, FG_WHITE);
 			}
 		}
-		return (playAnimation());
+
+		for (Food food : m_eachFoodPositions[m_day])
+		{
+			Draw(food.getXPosition(), food.getYPosition(), PIXEL_SOLID, FG_DARK_GREEN);
+		}
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		return true;
 	}
-
 	*/
