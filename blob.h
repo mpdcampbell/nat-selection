@@ -65,7 +65,9 @@ public:
 
 	void setBirthday(int day);
 
-	std::vector<std::array<int,2>> getPath();
+	std::vector<std::array<int,2>>& getPath();
+
+	void Blob::setPath(std::vector<std::array<int, 2>> &path);
 
 	void recordPath();
 

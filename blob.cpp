@@ -109,9 +109,14 @@ void Blob::sleep()
 	m_energy = m_nativeEnergy;
 }
 
-std::vector<std::array<int, 2>> Blob::getPath()
+std::vector<std::array<int, 2>>& Blob::getPath()
 {
 	return m_path;
+}
+
+void Blob::setPath(std::vector<std::array<int, 2>> &path)
+{
+	m_path = path;
 }
 
 void Blob::recordPath()

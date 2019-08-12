@@ -8,6 +8,7 @@
 #include <thread>         // std::this_thread::sleep_for
 #include <chrono>
 #include "blob.h"
+/*
 #include "olcPixelGameEngine.h"
 
 class Animation : public olc::PixelGameEngine
@@ -28,12 +29,12 @@ private:
 public:
 	Animation(int cellCount, std::vector<std::vector<std::array<int,2>>> &eachDaysSteps);
 
-	/*
+
 	void setBlobArray(std::vector<Blob> &allBlobs)
 	{
 		m_allBlobs = allBlobs;
 	}
-	*/
+	
 
 	bool OnUserCreate() override;
 
@@ -41,5 +42,6 @@ public:
 
 	bool OnUserUpdate(float fElapsedTime) override;
 };
+*/
 
 #endif

@@ -2,12 +2,30 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <cassert>
 #include "blob.h"
 #include "simulationResults.h"
 
 bool sortByName(Blob &x, Blob &y)
 {
 	return (x.getName()) < (y.getName());
+}
+
+void flipPathVectors(std::vector<Blob> &combinedArray)
+{
+	std::vector<std::array<int, 2>> flippedPath;
+	int length = static_cast<int>(combinedArray.size());
+	for (int i{ 0 }; i < length; ++i)
+	{
+		int pathSize = static_cast<int>(combinedArray[i].getPath().size());
+		std::vector<std::array<int, 2>> path{ combinedArray[i].getPath() };
+		for (std::array<int, 2> position : path)
+		{
+			flippedPath.push_back(position);
+		}
+		combinedArray[i].setPath(flippedPath);
+		flippedPath.clear();
+	}
 }
 
 simulationResults::simulationResults()
@@ -94,6 +112,10 @@ void simulationResults::recordDaysSteps(std::vector<Blob> &blobArray, std::vecto
 {
 	//Sort Blobs into original walking order, by using name
 	std::vector<Blob> allBlobs{combineBlobArrays(blobArray, deadBlobArray) };
+
+	//flip blob paths so that the first step taken is now top of the stack, rather than bottom
+	flipPathVectors(allBlobs);
+
 	int length{ static_cast<int>(allBlobs.size()) };
 	bool finished;
 	do
@@ -102,37 +124,24 @@ void simulationResults::recordDaysSteps(std::vector<Blob> &blobArray, std::vecto
 		for (int i{ 0 }; i<length;++i)
 		{
 			int speed = allBlobs[i].getSpeed();
-			std::vector<std::array<int,2>>& path = allBlobs[i].getPath();
+			//std::vector<std::array<int,2>>& path = allBlobs[i].getPath();
 
 			//If the blob has recorded positions in the path
-			if (path.size() >= speed)
+			if (allBlobs[i].getPath().size() >= speed)
 			{
-				if (allBlobs[i].getName() == 12)
-				{
-					std::cout << "Blob #" << allBlobs[i].getName() << " has a path size of " << path.size() << "\n";
-				}
 				/*iterate from first position to the nth position where n is the
 				number of steps that blob may take per turn. Erasing each position from
 				the blobs recorded path, after copying its value onto a seperate vector*/
 				int n{ 0 };
 				finished = false;
-				for (auto it = path.begin(); it != path.end();)
+				while (n < speed)
 				{
-					m_daysSteps.push_back(*it);
-					it = (path.erase(it));
+					m_daysSteps.push_back(allBlobs[i].getPath().back());
+					allBlobs[i].getPath().pop_back();
 					++n;
-					if (n >= speed)
-					{
-						it = path.end();
-					}
 				}
 			}
-			else
-			{
-			//	std::cout << "Path size successfully reduced to " << path.size() << "\n";
-			}
 		}
-
 	} while (!finished);
 
 	m_eachDaysSteps.push_back(m_daysSteps);
