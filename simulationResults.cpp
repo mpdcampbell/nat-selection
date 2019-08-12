@@ -6,28 +6,6 @@
 #include "blob.h"
 #include "simulationResults.h"
 
-bool sortByName(Blob &x, Blob &y)
-{
-	return (x.getName()) < (y.getName());
-}
-
-void flipPathVectors(std::vector<Blob> &combinedArray)
-{
-	std::vector<std::array<int, 2>> flippedPath;
-	int length = static_cast<int>(combinedArray.size());
-	for (int i{ 0 }; i < length; ++i)
-	{
-		int pathSize = static_cast<int>(combinedArray[i].getPath().size());
-		std::vector<std::array<int, 2>> path{ combinedArray[i].getPath() };
-		for (std::array<int, 2> position : path)
-		{
-			flippedPath.push_back(position);
-		}
-		combinedArray[i].setPath(flippedPath);
-		flippedPath.clear();
-	}
-}
-
 simulationResults::simulationResults()
 {
 }
@@ -100,66 +78,35 @@ void simulationResults::recordEachBlobStats(std::vector<Blob> &blobArray)
 	m_eachBlobStats.push_back(dayVector);
 }
 
-std::vector<Blob> simulationResults::combineBlobArrays(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray)
+void simulationResults::recordBlobFrame(std::vector<Blob> &blobArray)
 {
-	std::vector<Blob> allBlobs{ blobArray };
-	allBlobs.insert(allBlobs.end(), deadBlobArray.begin(), deadBlobArray.end());
-	std::sort(allBlobs.begin(), allBlobs.end(), &sortByName);
-	return allBlobs;
-}
-
-void simulationResults::recordDaysSteps(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray)
-{
-	//Sort Blobs into original walking order, by using name
-	std::vector<Blob> allBlobs{combineBlobArrays(blobArray, deadBlobArray) };
-
-	//flip blob paths so that the first step taken is now top of the stack, rather than bottom
-	flipPathVectors(allBlobs);
-
-	int length{ static_cast<int>(allBlobs.size()) };
-	bool finished;
-	do
+	for (Blob blob : blobArray)
 	{
-		finished = true;
-		for (int i{ 0 }; i<length;++i)
-		{
-			int speed = allBlobs[i].getSpeed();
-			//std::vector<std::array<int,2>>& path = allBlobs[i].getPath();
-
-			//If the blob has recorded positions in the path
-			if (allBlobs[i].getPath().size() >= speed)
-			{
-				/*iterate from first position to the nth position where n is the
-				number of steps that blob may take per turn. Erasing each position from
-				the blobs recorded path, after copying its value onto a seperate vector*/
-				int n{ 0 };
-				finished = false;
-				while (n < speed)
-				{
-					m_daysSteps.push_back(allBlobs[i].getPath().back());
-					allBlobs[i].getPath().pop_back();
-					++n;
-				}
-			}
-		}
-	} while (!finished);
-
-	m_eachDaysSteps.push_back(m_daysSteps);
-	m_daysSteps.clear();
-	//erase deadBlobs as no longer needed and to prevent repeat recording of blobs
-	deadBlobArray.clear();
-	length = blobArray.size();
-	for (int i{ 0 }; i < length; ++i)
-	{
-		blobArray[i].getPath().clear();
+		std::array<int, 2> position{ blob.getXPosition(), blob.getYPosition() };
+		m_blobFrame.push_back(position);
 	}
+
+	m_blobFrameArray.push_back(m_blobFrame);
+	m_blobFrame.clear();
 }
 
-void simulationResults::recordDay(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray)
+void simulationResults::pushBlobFrames()
+{
+	m_dailyBlobframes.push_back(m_blobFrameArray);
+	m_blobFrameArray.clear();
+}
+
+void simulationResults::recordFoodPositions(std::vector<Food> &foodArray)
+{
+	m_eachFoodArray.push_back(foodArray);
+}
+
+void simulationResults::recordDay(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray)
 {
 	recordAvgBlobStats(blobArray);
 	recordEachBlobStats(blobArray);
-	recordDaysSteps(blobArray, deadBlobArray);
+	recordFoodPositions(foodArray);
+	pushBlobFrames();
 }
 
 void simulationResults::recordSim()
@@ -190,12 +137,12 @@ std::vector<std::vector<std::vector<std::vector<double>>>> simulationResults::ge
 	return m_manySimEach;
 }
 
-std::vector<std::array<int, 2>> simulationResults::getDaysSteps()
+std::vector<std::vector<Food>> simulationResults::getEachFoodArray()
 {
-	return m_daysSteps;
+	return m_eachFoodArray;
 }
 
-std::vector<std::vector<std::array<int, 2>>> simulationResults::getEachDaysSteps()
+std::vector<std::vector<std::vector<std::array<int, 2>>>> simulationResults::getDailyBlobFrames()
 {
-	return m_eachDaysSteps;
+	return m_dailyBlobframes;
 }

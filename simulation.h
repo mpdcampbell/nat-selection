@@ -4,10 +4,11 @@
 #include <vector>
 #include "food.h"
 #include "blob.h"
+#include "simulationResults.h"
 
 extern int g_nameHolder;
 
-void walkAndEat(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray);
+void walkAndEat(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray, simulationResults &stats);
 
 void naturalSelection(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray);
 

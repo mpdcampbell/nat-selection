@@ -15,6 +15,7 @@ class Blob : public Thing
 {
 protected:
 	std::vector<std::array<int, 2>> m_path;
+	std::vector<std::vector<std::array<int, 2>>> m_totalPath;
 	double m_nativeEnergy;
 	double m_energy = m_nativeEnergy;
 	double m_sense;
@@ -67,7 +68,11 @@ public:
 
 	std::vector<std::array<int,2>>& getPath();
 
-	void Blob::setPath(std::vector<std::array<int, 2>> &path);
+	void setPath(std::vector<std::array<int, 2>> &path);
+
+	void pushDaysPath();
+
+	std::vector<std::vector<std::array<int, 2>>>& getTotalPath();
 
 	void recordPath();
 

@@ -81,6 +81,7 @@ std::vector<Blob> Map::populateBlobs(Blob &blob, int amount)
 		std::array<int, 2> xy{ getEdgePosition() };
 		blob.setName(i+1);
 		blob.setPosition(xy[0], xy[1]);
+		//blob.recordPath();
 		blobArray.push_back(blob);
 	}
 	return blobArray;

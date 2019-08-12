@@ -125,6 +125,25 @@ void Blob::recordPath()
 	m_path.push_back(position);
 }
 
+void Blob::pushDaysPath()
+{
+	m_totalPath.push_back(m_path);
+	/*for (auto path : m_totalPath)
+	{
+		std::cout<< m_name << ": Day "<<day<<"\n";
+		for (std::array<int, 2> position : path)
+		{
+			std::cout << m_name << ": " << position[0] << ", " << position[1] << "\n";
+		}
+		++day;
+	}*/
+}
+
+std::vector<std::vector<std::array<int,2>>>& Blob::getTotalPath()
+{
+	return m_totalPath;
+}
+
 /*Using convention that North and East are +ve and 
 South and West are -ve (cartesian)*/
 void Blob::stepNorth()

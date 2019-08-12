@@ -5,10 +5,11 @@
 #include "food.h"
 #include "blob.h"
 #include "simulation.h"
+#include "simulationResults.h"
 
 extern int g_nameHolder{ 0 };
 
-void walkAndEat(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray)
+void walkAndEat(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray, simulationResults &stats)
 {
 	bool staminaCheck;
 	do
@@ -22,7 +23,7 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, 
 				if (blobArray[i].getEnergy() > 0)
 				{
 
-					int before = blobArray[i].getName();
+					const int before = blobArray[i].getName();
 					std::optional<int> blobEaten{ std::nullopt };
 					staminaCheck = true;
 					if (blobArray[i].getFoodEaten() == 0)
@@ -54,7 +55,7 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, 
 					}
 					assert(before == blobArray[i].getName() && "Blob element tracking mistake");
 					blobArray[i].reduceEnergy();
-					blobArray[i].recordPath();
+					stats.recordBlobFrame(blobArray);
 				}
 			}
 		}
@@ -94,6 +95,8 @@ void breed(std::vector<Blob> &blobArray, int day)
 			//To get correct number for new blob name
 			clone.value().setName(g_nameHolder);
 			clone.value().setBirthday(day);
+			//To prevent carrying through path of ancestors
+			clone.value().getTotalPath().clear();
 			++g_nameHolder;
 			blobArray.push_back(clone.value());
 		}
@@ -110,10 +113,12 @@ void digestAndSleep(std::vector<Blob> &blobArray)
 	}
 }
 
-void blobsCarryOutDay(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray)
+/*
+void blobsCarryOutDay(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray, std)
 {
-	walkAndEat(blobArray, deadBlobArray, foodArray);
+	walkAndEat(blobArray, deadBlobArray, foodArray, stats;
 	naturalSelection(blobArray, deadBlobArray);
 	breed(blobArray, 0);
 	digestAndSleep(blobArray);
 }
+*/
