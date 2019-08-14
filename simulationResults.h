@@ -7,17 +7,20 @@
 #include "blob.h"
 #include "food.h"
 
+double getMax(std::vector<double> &vector);
+
 class simulationResults
 {
 protected:
+	int simCounter{ 0 };
 	std::vector<std::array<double, 10>> m_avgBlobStats;
 	std::vector<std::vector<std::vector<double>>> m_eachBlobStats;
 	std::vector<std::vector<std::array<double, 10>>> m_manySimAvg;
 	std::vector<std::vector<std::vector<std::vector<double>>>> m_manySimEach;
 
-	std::vector<std::array<int, 2>> m_blobFrame;
-	std::vector<std::vector<std::array<int, 2>>> m_blobFrameArray;
-	std::vector<std::vector<std::vector<std::array<int, 2>>>> m_dailyBlobframes;
+	std::vector<std::array<double, 5>> m_blobFrame;
+	std::vector<std::vector<std::array<double, 5>>> m_blobFrameArray;
+	std::vector<std::vector<std::vector<std::array<double, 5>>>> m_dailyBlobframes;
 	std::vector<std::vector<Food>> m_eachFoodArray;
 
 public:
@@ -38,18 +41,17 @@ public:
 
 	void recordSim();
 
-	std::vector<std::array<double, 10>> getAvgBlobStats();
+	std::vector<std::array<double, 10>>& getAvgBlobStats();
 
-	std::vector<std::vector<std::vector<double>>> getEachBlobStats();
+	std::vector<std::vector<std::vector<double>>>& getEachBlobStats();
 
-	std::vector<std::vector<std::array<double, 10>>> getManySimAvg();
+	std::vector<std::vector<std::array<double, 10>>>& getManySimAvg();
 
-	std::vector<std::vector<std::vector<std::vector<double>>>> getManySimEach();
+	std::vector<std::vector<std::vector<std::vector<double>>>>& getManySimEach();
 
-	std::vector<std::vector<Food>> getEachFoodArray();
+	std::vector<std::vector<Food>>& getEachFoodArray();
 
-	std::vector<std::vector<std::vector<std::array<int, 2>>>> simulationResults::getDailyBlobFrames();
-
+	std::vector<std::vector<std::vector<std::array<double, 5>>>>& simulationResults::getDailyBlobFrames();
 };
 
 #endif

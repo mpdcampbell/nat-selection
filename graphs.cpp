@@ -5,19 +5,6 @@
 #include "gnuplot-iostream.h"
 #include "graphs.h"
 
-double getMax(std::vector<double> &vector)
-{
-	double max = vector[0];
-	for (int i = 0; i < vector.size(); i++)
-	{
-		if (max < vector[i])
-		{
-			max = vector[i];
-		}
-	}
-	return max;
-}
-
 void makeAvgGraphs(simulationResults &stats)
 {
 	std::cout << "Making graph of mean stat values over time...\n";

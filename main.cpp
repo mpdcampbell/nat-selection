@@ -27,7 +27,7 @@ int main()
 	simulationResults stats;
 	
 	//INITIAL BLOB STATS
-	double nativeEnergy{ 2000.0 };
+	double nativeEnergy{ 1500.0 };
 	double seedSize{ 3.0 }; 
 	double seedSpeed{ 3.0 };
 	double seedSense{ 6.0 }; 
@@ -35,13 +35,17 @@ int main()
 
 	//ENVIRONMENT VARIABLES
 	map.setMapSize(30); // integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 30 }; //starting number of Blobs
+	int seedBlobCount{ 40 }; //starting number of Blobs
 	int foodCount{ 50 }; // number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
 	g_mutationProb = 20; //integer probability of a blob stat mutating during replication
-	int dayCount{200}; // length of simulation in days
+	int dayCount{150}; // length of simulation in days
 	int simCount{1}; // number of repeat simulations run
+
+	//ANIMATION VARIABLES
+	int xResolution{ 1240 };
+	int yResolution{ 610 };
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
 	{
@@ -71,38 +75,21 @@ int main()
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day 
 	
-	int length = map.getMapSize();
-	std::vector<std::vector<Food>> eachFoodArray = stats.getEachFoodArray();
-	auto dailyBlobFrames = stats.getDailyBlobFrames();
+   //int firstSim{ 0 }, lastSim{ 0 }; //Which simulation runs to create histogram gifs for
 	
-	/*
-	for (auto day : dailyBlobFrames)
-	{
-		for (auto frameArray : day)
-		{
-			for (auto frame : frameArray)
-			{
-				if (frame[0] > (length + 1) || frame[1] > (length + 1))
-				{
-					std::cout << frame[0] << ", " << frame[1] << "\n";
-				}
-			}
-		}
-	}
-	*/
+  //makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
-	Animation blobSim(length, eachFoodArray, dailyBlobFrames);
 
-	if (blobSim.Construct(720, 720, 1, 1))
+	
+	//ANIMATION
+	Animation blobSim(map.getMapSize(), stats);
+
+	if (blobSim.Construct(xResolution, yResolution, 1, 1))
 	{
 		blobSim.Start();
 	}
-	
-	//int firstSim{ 0 }, lastSim{ 0 }; //Which simulation runs to create histogram gifs for
-	
-	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
 	system("pause");
-	
+
 	return 0;
 }

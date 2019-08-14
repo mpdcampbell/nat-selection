@@ -2,6 +2,7 @@
 #include <array>
 #include "blob.h"
 #include "food.h"
+#include "simulationResults.h"
 #include "animation.h"
 
 Animation::Animation()
@@ -9,12 +10,34 @@ Animation::Animation()
 	sAppName = "Natural Selection Simulation";
 }
 
-Animation::Animation(int cellCount, std::vector<std::vector<Food>> &eachFoodPositions,
-	std::vector<std::vector<std::vector<std::array<int, 2>>>> &dailyBlobFrames)
-	: m_gridCount{ cellCount }, m_eachFoodPositions{ eachFoodPositions },
-	m_dailyBlobFrames{ dailyBlobFrames }
+Animation::Animation(int cellCount, simulationResults &stats)
+	: m_gridCount{ cellCount }, m_stats{ stats }
 {
+	sAppName = "Natural Selection Simulation";
+}
 
+bool Animation::OnUserCreate()
+{
+	m_eachFoodPositions = m_stats.getEachFoodArray();
+	m_dailyBlobFrames = m_stats.getDailyBlobFrames();
+	m_avgBlobStats = m_stats.getManySimAvg()[0];
+	m_blackBorder = 2;
+	m_homeCount = m_gridCount + 2;
+	m_screenCount = m_homeCount + (m_blackBorder * 2);
+	m_cellSize = ScreenHeight() / m_screenCount;
+	m_cellBorderWidth = 1;
+	m_day = 1;
+	m_frame = 0;
+
+	if (m_cellSize < 5)
+	{
+		std::cout << "mapSize too large to display, each grid space is smaller than a single pixel.\n";
+		return false;
+	}
+
+	fixCoords();
+	scaleStats(0,255);
+	return true;
 }
 
 void Animation::fixCoords()
@@ -26,8 +49,8 @@ void Animation::fixCoords()
 		{
 			for (int k{ 0 }; k < (m_dailyBlobFrames[i])[j].size(); ++k)
 			{
-				int x = m_dailyBlobFrames[i][j][k][0];
-				int y = m_dailyBlobFrames[i][j][k][1];
+				double x = m_dailyBlobFrames[i][j][k][0];
+				double y = m_dailyBlobFrames[i][j][k][1];
 
 				/*Rotates each point 90 degrees clockwise about origin,
 				then shifts upwards by n. This converts mycartesion system
@@ -39,23 +62,43 @@ void Animation::fixCoords()
 	}
 }
 
-bool Animation::OnUserCreate()
+void Animation::scaleStats(int start, int end)
 {
-	m_screenCount = m_gridCount + 15;
-	m_homeCount = m_gridCount + 2;
-	m_cellSize = ScreenHeight() / m_screenCount;
-	m_borderWidth = 1;
-	m_day = 1;
-	m_frame = 0;
+	std::vector<double> maxSize, maxSpeed, maxSense;
+	double maxSizeVal{ 0 }, maxSpeedVal{ 0 }, maxSenseVal{ 0 };
 
-	fixCoords();
-	return true;
+	for (std::array<double, 10> day : m_avgBlobStats)
+	{
+		maxSize.push_back(day[4]);
+		maxSpeed.push_back(day[5]);
+		maxSense.push_back(day[6]);
+	}
+	maxSizeVal = getMax(maxSize);
+	maxSpeedVal = getMax(maxSpeed);
+	maxSenseVal = getMax(maxSense);
+
+	for (int i{ 0 }; i < m_dailyBlobFrames.size(); ++i)
+	{
+		for (int j{ 0 }; j < m_dailyBlobFrames[i].size(); ++j)
+		{
+			for (int k{ 0 }; k < (m_dailyBlobFrames[i])[j].size(); ++k)
+			{
+				double size = m_dailyBlobFrames[i][j][k][2];
+				double speed = m_dailyBlobFrames[i][j][k][3];
+				double sense = m_dailyBlobFrames[i][j][k][4];
+
+				m_dailyBlobFrames[i][j][k][2] = size * (end / maxSizeVal);
+				m_dailyBlobFrames[i][j][k][3] = speed * (end / maxSpeedVal);
+				m_dailyBlobFrames[i][j][k][4] = sense * (end / maxSenseVal);
+			}
+		}
+	}
 }
 
 
 bool Animation::OnUserUpdate(float fElapsedTime)
 {
-	std::cout << "Day: " << m_day << "\n";
+	//std::cout << "Day: " << m_day << "\n";
 	if (GetKey(olc::Key::SPACE).bHeld)
 	{
 		return true;
@@ -64,41 +107,85 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	//Clear Screen
 	FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
 
-
-	//Draw Home hopefully
-	olc::Pixel grey{ 192, 192, 192 };
-	for (int x = 1; x < m_gridCount + 3; ++x)
+	//Write Day Number
 	{
-		for (int y = 1; y < m_gridCount + 3; ++y)
+		std::string title = "Day #" + std::to_string(m_day);
+		//Math to scale title size and position with changing grid sizes
+		int scale{ (m_blackBorder*m_cellSize / 16) };
+		int y{ (m_blackBorder*m_cellSize / 2) - scale * 3 };
+		int x{ ((m_homeCount*m_cellSize / 2) - (scale * 8)) };
+		DrawString(x, y, title, olc::WHITE, scale);
+	}
+	
+	//Draw Home hopefully
+	for (int x = m_blackBorder; x < m_homeCount + m_blackBorder; ++x)
+	{
+		for (int y = m_blackBorder; y < m_homeCount + m_blackBorder; ++y)
 		{
 
-			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize, m_cellSize, grey);
+			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize, m_cellSize, olc::GREY);
 		}
 	}
 
 	//Draw Grid / Map 
-	for (int x = 2; x < m_gridCount + 2; ++x)
+	for (int x = m_blackBorder+1; x < m_gridCount + m_blackBorder + 1; ++x)
 	{
-		for (int y = 2; y < m_gridCount + 2; ++y)
+		for (int y = m_blackBorder + 1; y < m_gridCount + m_blackBorder + 1; ++y)
 		{
 			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize, m_cellSize, olc::BLACK);
-			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize - m_borderWidth, m_cellSize - m_borderWidth, olc::WHITE);
+			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize - m_cellBorderWidth, m_cellSize - m_cellBorderWidth, olc::WHITE);
 		}
 	}
 
-	for (Food food : m_eachFoodPositions[m_day])
+	/*
+	//Draw Colour Bar in cells
+	for (int x = m_homeCount + 2*m_blackBorder; x < m_homeCount + 2*m_blackBorder + 2; ++x)
 	{
-		olc::Pixel green_50{ 0, 255, 0, 128 };
-		FillRect((food.getXPosition() + 1)* m_cellSize, (food.getYPosition() + 1)* m_cellSize, m_cellSize - m_borderWidth, m_cellSize - m_borderWidth, green_50);
+		int step{ 0 };
+		for (int y = m_blackBorder+1; y < m_gridCount + m_blackBorder; ++y)
+		{
+			olc::Pixel redToBlue((255 - step), 0, step);
+			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize + m_cellBorderWidth, m_cellSize + m_cellBorderWidth, olc::WHITE);
+			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize, m_cellSize, redToBlue);
+			step += (255 / m_homeCount);
+		}
+	}
+	*/
+
+	//Draw Colour Bar in lines
+	{
+		int x = ((m_homeCount + 2 * m_blackBorder)*m_cellSize);
+		double step{ 0.0 };
+		int numLinesDrawn{ 0 };
+		for (int y = (m_blackBorder + 1)*m_cellSize; y <= (m_gridCount + m_blackBorder)*m_cellSize; ++y)
+		{
+			olc::Pixel redToBlue((255 - (step)), 0, (step));
+			DrawLine(x, y, x + (2 * m_cellSize), y, redToBlue);
+			++numLinesDrawn;
+			step = step + (255.0 / (m_gridCount*m_cellSize));
+		}
+
+		
 	}
 
-	for (auto position : (m_dailyBlobFrames[m_day])[m_frame])
+	//Draw Food onto map
+	for (Food food : m_eachFoodPositions[m_day])
 	{
-		olc::Pixel blue_50{ 0, 0, 255, 128 };
-		FillRect((position[0] + 1) * m_cellSize, (position[1] + 1) * m_cellSize, m_cellSize - m_borderWidth, m_cellSize - m_borderWidth, blue_50);
+		olc::Pixel green_custom{ 34, 139, 34, 127};
+		FillCircle((food.getXPosition() + m_blackBorder+0.5)* m_cellSize, (food.getYPosition() + m_blackBorder+0.5)* m_cellSize, 0.4*m_cellSize, green_custom);
+	}
+
+	//Draw Blobs onto map
+	for (auto element : (m_dailyBlobFrames[m_day])[m_frame])
+	{
+		int scaledSize{ static_cast<int>(element[2]) };
+		olc::Pixel blueToRed(scaledSize, 0, (255-scaledSize));
+		FillRect((element[0] + m_blackBorder) * m_cellSize, (element[1] + m_blackBorder) * m_cellSize, m_cellSize - m_cellBorderWidth, m_cellSize - m_cellBorderWidth, blueToRed);
+		
+		//If Blob overlaps food, then remove food from foodPosition array
 		for (auto it = m_eachFoodPositions[m_day].begin(); it != m_eachFoodPositions[m_day].end();)
 		{
-			if (it->getXPosition() == position[0] && it->getYPosition() == position[1])
+			if (it->getXPosition() == element[0] && it->getYPosition() == element[1])
 			{
 				it = m_eachFoodPositions[m_day].erase(it);
 			}
@@ -111,17 +198,22 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 
 	++m_frame;
 
+	/*If completed all frames for that day, move onto next day and
+	reset the frame counter to zero*/
 	if (m_frame == static_cast<int>(m_dailyBlobFrames[m_day].size()))
 	{
 		++m_day;
 		m_frame = 0;
 	}
-
+	//When finished all days, end animation
 	if (m_day == m_dailyBlobFrames.size())
 	{
 		return false;
 	}
 
+	/*Can be used as a delay between each step if your computer is too fast
+	and the animation runs too quickly*/
 	//std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
 	return true;
 }

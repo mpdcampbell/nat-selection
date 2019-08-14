@@ -379,7 +379,7 @@ std::optional<int> Blob::lookForFood(std::vector<Food> &foodArray)
 		is within it. With sense as a double, the rounding down of int x means
 		there is increased energetic cost (cost is a double) for every increase in sense
 		but only an evolutionary advantage when sense increases by a whole unit. int x has
-		to stay int because the tile spaces are in integers. */
+		to stay int because the tile spaces are in integers.*/
 		for (int x(m_xPosition - m_sense); x <= (m_xPosition + m_sense); ++x)
 		{
 			if (x == foodArray[i].getXPosition())

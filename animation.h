@@ -5,28 +5,33 @@
 #include <array>
 #include "blob.h"
 #include "food.h"
+#include "simulationResults.h"
 #include "olcPixelGameEngine.h"
 
 class Animation : public olc::PixelGameEngine
 {
 private:
+	int m_blackBorder;
 	int m_screenCount;
 	int m_homeCount;
 	int m_gridCount;
 	int m_cellSize;
-	int m_borderWidth;
+	int m_cellBorderWidth;
 	int m_day;
 	int m_frame;
+	simulationResults m_stats;
 	std::vector<std::vector<Food>> m_eachFoodPositions;
-	std::vector<std::vector<std::vector<std::array<int, 2>>>> m_dailyBlobFrames;
+	std::vector<std::vector<std::vector<std::array<double, 5>>>> m_dailyBlobFrames;
+	std::vector<std::array<double, 10>> m_avgBlobStats;
 
 public:
 	Animation();
 
-	Animation(int cellCount, std::vector<std::vector<Food>> &eachFoodPositions,
-		std::vector<std::vector<std::vector<std::array<int, 2>>>> &dailyBlobFrames);
+	Animation(int cellCount, simulationResults &stats);
 
 	void fixCoords();
+
+	void scaleStats(int start, int end);
 
 	bool OnUserCreate() override;
 
