@@ -96,8 +96,7 @@ public:
 
 	bool atFood(Food &food);
 
-	std::optional<int> huntOrRun(std::vector<Blob> &blobArray, 
-		std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray);
+	std::optional<int> huntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
 	
 	int distToObject(Thing &object);
 

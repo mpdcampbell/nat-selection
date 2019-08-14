@@ -1,35 +1,36 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-/*
 #include <vector>
 #include <array>
-#include <algorithm>
-#include <utility>
-#include <thread>         // std::this_thread::sleep_for
-#include <chrono>
 #include "blob.h"
 #include "food.h"
-#include "olcConsoleGameEngine.h"
+#include "olcPixelGameEngine.h"
 
-class Animation : public olcConsoleGameEngine
+class Animation : public olc::PixelGameEngine
 {
+private:
+	int m_screenCount;
+	int m_homeCount;
+	int m_gridCount;
+	int m_cellSize;
+	int m_borderWidth;
+	int m_day;
+	int m_frame;
+	std::vector<std::vector<Food>> m_eachFoodPositions;
+	std::vector<std::vector<std::vector<std::array<int, 2>>>> m_dailyBlobFrames;
+
 public:
 	Animation();
 
-private:
-	int m_cellCount;
-	int m_day;
-	std::vector<std::vector<Food>> m_eachFoodPositions;
+	Animation(int cellCount, std::vector<std::vector<Food>> &eachFoodPositions,
+		std::vector<std::vector<std::vector<std::array<int, 2>>>> &dailyBlobFrames);
 
-public:
-	Animation(int cellCount, std::vector<std::vector<Food>> &eachFoodPositions);
-	
+	void fixCoords();
+
 	bool OnUserCreate() override;
-
-	//bool playAnimation();
 
 	bool OnUserUpdate(float fElapsedTime) override;
 };
-*/
+
 #endif

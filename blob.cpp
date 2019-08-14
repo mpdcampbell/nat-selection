@@ -219,7 +219,8 @@ void Blob::stepAway(Thing &thing)
 	int xdif = thing.getXPosition() - m_xPosition;
 	int ydif = thing.getYPosition() - m_yPosition;
 
-	/* Blobs at Home that want to run from predators*/
+	/* Blobs at Home that want to run from predators, 
+	can run but only within the boundaries.*/
 	if (atHome())
 	{
 		if (m_xPosition == 0 || m_xPosition >= m_mapSize + 1)
@@ -267,13 +268,9 @@ bool Blob::atFood(Food &food)
 	return false;
 }
 
-std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray)
+std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray)
 {
-	//std::optional<int> predOpt{ std::nullopt };
-	//if (!atHome())
-	//{
 	std::optional<int> predOpt = lookForPredator(blobArray);
-	//}
 	std::optional<int> foodOpt = lookForFood(foodArray);
 	std::optional<int> preyOpt = lookForPrey(blobArray);
 	//guaranteed larger than any dist to object on map
@@ -314,9 +311,6 @@ std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Blo
 	else if (preyDist == 0) //if ontop of prey
 	{
 		auto it = blobArray.begin();
-		//copy deadBlob to deadBlobArray for animation
-		Blob deadBlob = *(it+ preyOpt.value());
-		deadBlobArray.push_back(deadBlob);
 		//erase that blob element
 		blobArray.erase(it + preyOpt.value());
 		setFoodEaten(getFoodEaten() + 1);

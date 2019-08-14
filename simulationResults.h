@@ -34,7 +34,7 @@ public:
 
 	void recordFoodPositions(std::vector<Food> &foodArray);
 
-	void recordDay(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray);
+	void recordDay(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
 
 	void recordSim();
 

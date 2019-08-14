@@ -8,3 +8,4 @@ Debug
 gnuplot-iostream.h
 AverageChange.png
 olcPixelGameEngine.h
+olcConsoleGameEngine.h

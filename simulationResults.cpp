@@ -101,7 +101,7 @@ void simulationResults::recordFoodPositions(std::vector<Food> &foodArray)
 	m_eachFoodArray.push_back(foodArray);
 }
 
-void simulationResults::recordDay(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, std::vector<Food> &foodArray)
+void simulationResults::recordDay(std::vector<Blob> &blobArray, std::vector<Food> &foodArray)
 {
 	recordAvgBlobStats(blobArray);
 	recordEachBlobStats(blobArray);
