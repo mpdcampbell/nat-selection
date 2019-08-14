@@ -32,7 +32,12 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, 
 					}
 					else if (blobArray[i].getFoodEaten() == 1 && blobArray[i].hasSurplusStamina())
 					{
-						blobEaten = blobArray[i].huntOrRun(blobArray, deadBlobArray, foodArray);
+						/*if not at home added because blobs which were safely 
+						home were still runningfrom predators*/
+						//if (!blobArray[i].atHome())
+						//{
+							blobEaten = blobArray[i].huntOrRun(blobArray, deadBlobArray, foodArray);
+						//}	
 					}
 					else
 					{
@@ -53,7 +58,11 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Blob> &deadBlobArray, 
 							--i;
 						}
 					}
-					assert(before == blobArray[i].getName() && "Blob element tracking mistake");
+					//assert(before == blobArray[i].getName() && "Blob element tracking mistake");
+					//if (blobArray[i].getXPosition() > blobArray[i].getMapSize() + 1)
+					//{
+					//	std::cout << blobArray[i].getName() << ": " << blobArray[i].getXPosition() << "\n";
+					//}
 					blobArray[i].reduceEnergy();
 					stats.recordBlobFrame(blobArray);
 				}

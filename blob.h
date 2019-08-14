@@ -58,6 +58,8 @@ public:
 
 	void setMapSize(int x);
 
+	int getMapSize();
+
 	int getFoodEaten();
 
 	void setFoodEaten(int x);
