@@ -33,6 +33,8 @@ public:
 
 	void scaleStats(int start, int end);
 
+	void drawBlob(int x, int y, double scaledStat);
+
 	bool OnUserCreate() override;
 
 	bool OnUserUpdate(float fElapsedTime) override;

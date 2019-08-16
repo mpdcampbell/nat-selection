@@ -34,9 +34,9 @@ int main()
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
 	//ENVIRONMENT VARIABLES
-	map.setMapSize(30); // integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 40 }; //starting number of Blobs
-	int foodCount{ 50 }; // number of food pieces place randomly on map daily
+	map.setMapSize(20); // integer length, in grid spaces, of one side of the square map
+	int seedBlobCount{25}; //starting number of Blobs
+	int foodCount{ 30 }; // number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
 	g_mutationProb = 20; //integer probability of a blob stat mutating during replication
@@ -44,8 +44,8 @@ int main()
 	int simCount{1}; // number of repeat simulations run
 
 	//ANIMATION VARIABLES
-	int xResolution{ 1240 };
-	int yResolution{ 610 };
+	int xResolution{ 900 };
+	int yResolution{ 720 };
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
 	{
@@ -79,8 +79,6 @@ int main()
 	
   //makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
-
-	
 	//ANIMATION
 	Animation blobSim(map.getMapSize(), stats);
 
@@ -88,8 +86,6 @@ int main()
 	{
 		blobSim.Start();
 	}
-
-	system("pause");
-
+	
 	return 0;
 }
