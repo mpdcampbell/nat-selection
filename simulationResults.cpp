@@ -19,6 +19,7 @@ double getMax(std::vector<double> &vector)
 	return max;
 }
 
+
 simulationResults::simulationResults()
 {
 }

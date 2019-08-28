@@ -94,7 +94,6 @@ void makeAvgGraphs(simulationResults &stats)
 	gp << "unset key\n";
 	gp << "set xlabel 'Days'\n";
 
-
 	// Population plot
 	gp << "set ylabel 'Blob Population'\n";
 	gp << "set yrange[0:" << (maxPop + (10)) << "]\n";

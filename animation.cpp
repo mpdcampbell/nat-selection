@@ -1,5 +1,6 @@
 #include <vector>
 #include <array>
+#include <math.h>
 #include "blob.h"
 #include "food.h"
 #include "simulationResults.h"
@@ -10,34 +11,10 @@ Animation::Animation()
 	sAppName = "Natural Selection Simulation";
 }
 
-Animation::Animation(int cellCount, simulationResults &stats)
-	: m_gridCount{ cellCount }, m_stats{ stats }
+Animation::Animation(int cellCount, simulationResults &stats, ColourStat colourStat = ColourStat::SIZE)
+	: m_gridCount{ cellCount }, m_stats{ stats }, m_colourStat{ colourStat }
 {
 	sAppName = "Natural Selection Simulation";
-}
-
-bool Animation::OnUserCreate()
-{
-	m_eachFoodPositions = m_stats.getEachFoodArray();
-	m_dailyBlobFrames = m_stats.getDailyBlobFrames();
-	m_avgBlobStats = m_stats.getManySimAvg()[0];
-	m_blackBorder = 2;
-	m_homeCount = m_gridCount + 2;
-	m_screenCount = m_homeCount + (m_blackBorder * 2);
-	m_cellSize = ScreenHeight() / m_screenCount;
-	m_cellBorderWidth = 1;
-	m_day = 1;
-	m_frame = 0;
-
-	if (m_cellSize < 5)
-	{
-		std::cout << "mapSize too large to display, each grid space is smaller than a single pixel.\n";
-		return false;
-	}
-
-	fixCoords();
-	scaleStats(0,255);
-	return true;
 }
 
 void Animation::fixCoords()
@@ -53,8 +30,8 @@ void Animation::fixCoords()
 				double y = m_dailyBlobFrames[i][j][k][1];
 
 				/*Rotates each point 90 degrees clockwise about origin,
-				then shifts upwards by n. This converts mycartesion system
-				to the matrix system used in the animation library*/
+				then shifts upwards by n. This converts my cartesian system
+				to the matrix system used in the olcPixelGameEngine library*/
 				m_dailyBlobFrames[i][j][k][0] = (y);
 				m_dailyBlobFrames[i][j][k][1] = -x + n;
 			}
@@ -62,16 +39,96 @@ void Animation::fixCoords()
 	}
 }
 
+void Animation::scaleStats(double scaleRange)
+{
+	std::vector<double> maxSize, maxSpeed, maxSense;
+	double maxSizeVal{ 0 }, maxSpeedVal{ 0 }, maxSenseVal{ 0 };
+
+	for (std::array<double, 10> day : m_avgBlobStats)
+	{
+		maxSize.push_back(day[4]);
+		maxSpeed.push_back(day[5]);
+		maxSense.push_back(day[6]);
+	}
+	maxSizeVal = getMax(maxSize);
+	maxSpeedVal = getMax(maxSpeed);
+	maxSenseVal = getMax(maxSense);
+
+	switch (m_colourStat)
+	{
+		case (ColourStat::SIZE):
+			m_colourBarMax = maxSizeVal;
+			break;
+		case (ColourStat::SPEED):
+			m_colourBarMax = maxSpeedVal;
+			break;
+		case (ColourStat::SENSE):
+			m_colourBarMax = maxSenseVal;
+			break;
+	}
+
+	for (int i{ 0 }; i < m_dailyBlobFrames.size(); ++i)
+	{
+		for (int j{ 0 }; j < m_dailyBlobFrames[i].size(); ++j)
+		{
+			for (int k{ 0 }; k < (m_dailyBlobFrames[i])[j].size(); ++k)
+			{
+				double size = m_dailyBlobFrames[i][j][k][2];
+				double speed = m_dailyBlobFrames[i][j][k][3];
+				double sense = m_dailyBlobFrames[i][j][k][4];
+
+				m_dailyBlobFrames[i][j][k][2] = size * (scaleRange / maxSizeVal);
+				m_dailyBlobFrames[i][j][k][3] = speed * (scaleRange / maxSpeedVal);
+				m_dailyBlobFrames[i][j][k][4] = sense * (scaleRange / maxSenseVal);
+			}
+		}
+	}
+}
+
 void Animation::drawBlob(int x, int y, double s)
 {
-	double t = s / 255.0;
-	olc::Pixel lightBTR(44.0+(t*202.0), 232.0 - (t*115.0), (245.0 -(t*123.0)));
+	olc::Pixel lightBTR;
+	olc::Pixel midBTR;
+	olc::Pixel darkBTR;
+	olc::Pixel blackBTR;
+	olc::Pixel white{ 255,255,255,255 };
+
+	double t = (s / m_scaleRange)*2;
+
+	if (s <= m_scaleRange / 2.0)
+	{
+		olc::Pixel temp1(44.0 + (t*202.0), 232.0 - (t*115.0), (245.0 - (t*59.0)));
+		lightBTR = temp1;
+		olc::Pixel temp2(t*228.0, 149.0 - (t * 90.0), 233.0 - (t * 81.0));
+		midBTR = temp2;
+		olc::Pixel temp3(18.0 + (t * 140), 78.0 - (t * 38.0), 137.0 - (t*24.0));
+		darkBTR = temp3;
+		olc::Pixel temp4(38.0 + (t * 30), 43.0 + (t*3.0), 68.0 - (t * 0.0));
+		blackBTR = temp4;
+	}
+	if (s > m_scaleRange / 2.0)
+	{
+		olc::Pixel temp1(228.0, 59.0, (186.0 - (t*64.0)));
+		lightBTR = temp1;
+		olc::Pixel temp2(228.0, 59.0, 152.0 - (t * 84.0));
+		midBTR = temp2;
+		olc::Pixel temp3(158.0, 40.0, 113.0 - (t*60.0));
+		darkBTR = temp3;
+		olc::Pixel temp4(68.0, 43.0 + (t*2.0), 68.0 - (t * 30.0));
+		blackBTR = temp4;
+	}
+
+	int i;
+	int b = m_cellSize / 8;
+
+	/*
+	olc::Pixel lightBTR(44.0 + (t*202.0), 232.0 - (t*115.0), (245.0 - (t*123.0)));
 	olc::Pixel midBTR(t*228.0, 149.0 - (t * 90.0), 233.0 - (t * 165));
 	olc::Pixel darkBTR(18.0 + (t * 140), 78.0 - (t * 38.0), 137.0 - (t*84.0));
 	olc::Pixel blackBTR(38.0 + (t * 30), 43.0 + (t*6.0), 68.0 - (t * 30.0));
 	olc::Pixel white(255, 255, 255, 255);
-	int i;
-	int b = m_cellSize / 8;
+	*/
+
 	//y
 	for (i = 0; i < b; ++i)
 	{
@@ -88,7 +145,6 @@ void Animation::drawBlob(int x, int y, double s)
 		DrawLine(x, y + (2*b)+i, x + (4*b), y + (2*b)+i, lightBTR);
 		DrawLine(x + (4*b), y + (2*b)+i, x + (8*b), y + (2*b)+i, midBTR);
 	}
-	
 	//y+3
 	FillRect(x, y + (3 * b), b, b, lightBTR);
 	FillRect(x + (1 * b), y + (3 * b), b, b, midBTR);
@@ -132,74 +188,32 @@ void Animation::drawBlob(int x, int y, double s)
 	{
 		DrawLine(x + (2*b), y + (7*b)+i, x + (6*b), y + (7*b)+i, darkBTR);
 	}
-
-	/*
-	//y
-	DrawLine(x + 2, y, x + 5, y, lightBTR);
-	//y+1
-	DrawLine(x + 1, y + 1, x + 6, y + 1, lightBTR);
-	//y+2
-	DrawLine(x, y + 2, x + 3, y + 2, lightBTR);
-	DrawLine(x + 4, y + 2, x + 7, y + 2, midBTR);
-	//y+3
-	Draw(x, y + 3, lightBTR);
-	Draw(x + 1, y + 3, midBTR);
-	Draw(x + 2, y + 3, olc::WHITE);
-	DrawLine(x + 3, y + 3, x + 4, y + 3, midBTR);
-	Draw(x + 5, y + 3, olc::WHITE);
-	DrawLine(x + 6, y + 3, x + 7, y + 3, midBTR);
-	//y+4
-	Draw(x, y + 4, midBTR);
-	Draw(x + 1, y + 4, darkBTR);
-	Draw(x + 2, y + 4, blackBTR);
-	DrawLine(x + 3, y + 4, x + 4, y + 5, darkBTR);
-	Draw(x + 5, y + 4, blackBTR);
-	DrawLine(x + 6, y + 4, x + 7, y + 4, midBTR);
-	//y+5
-	DrawLine(x, y + 5, x + 1, y + 5, midBTR);
-	DrawLine(x + 2, y + 5, x + 6, y + 5, darkBTR);
-	Draw(x + 7, y + 5, midBTR);
-	//y+6
-	DrawLine(x + 1, y + 6, x + 6, y + 6, darkBTR);
-	//y+7
-	DrawLine(x + 2, y + 7, x + 5, y + 7, darkBTR);
-	*/
 }
 
-
-void Animation::scaleStats(int start, int end)
+bool Animation::OnUserCreate()
 {
-	std::vector<double> maxSize, maxSpeed, maxSense;
-	double maxSizeVal{ 0 }, maxSpeedVal{ 0 }, maxSenseVal{ 0 };
+	m_eachFoodPositions = m_stats.getEachFoodArray();
+	m_dailyBlobFrames = m_stats.getDailyBlobFrames();
+	m_avgBlobStats = m_stats.getManySimAvg()[0];
+	m_blackBorder = 2;
+	m_homeCount = m_gridCount + 2;
+	m_screenCount = m_homeCount + (m_blackBorder * 2);
+	m_cellSize = ScreenHeight() / m_screenCount;
+	m_cellBorderWidth = 1;
+	m_day = 1;
+	m_frame = 0;
+	m_scaleRange = 100.0;
 
-	for (std::array<double, 10> day : m_avgBlobStats)
+	if (m_cellSize < 8)
 	{
-		maxSize.push_back(day[4]);
-		maxSpeed.push_back(day[5]);
-		maxSense.push_back(day[6]);
+		std::cout << "\nMap size too large to display, increase window resolution or decrease map size.\n\n";
+		return false;
 	}
-	maxSizeVal = getMax(maxSize);
-	maxSpeedVal = getMax(maxSpeed);
-	maxSenseVal = getMax(maxSense);
 
-	for (int i{ 0 }; i < m_dailyBlobFrames.size(); ++i)
-	{
-		for (int j{ 0 }; j < m_dailyBlobFrames[i].size(); ++j)
-		{
-			for (int k{ 0 }; k < (m_dailyBlobFrames[i])[j].size(); ++k)
-			{
-				double size = m_dailyBlobFrames[i][j][k][2];
-				double speed = m_dailyBlobFrames[i][j][k][3];
-				double sense = m_dailyBlobFrames[i][j][k][4];
-
-				m_dailyBlobFrames[i][j][k][2] = size * (end / maxSizeVal);
-				m_dailyBlobFrames[i][j][k][3] = speed * (end / maxSpeedVal);
-				m_dailyBlobFrames[i][j][k][4] = sense * (end / maxSenseVal);
-			}
-		}
-	}
+	fixCoords();
+	scaleStats(m_scaleRange);
+	return true;
 }
-
 
 bool Animation::OnUserUpdate(float fElapsedTime)
 {
@@ -213,16 +227,14 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
 
 	//Write Day Number
-	{
-		std::string title = "Day #" + std::to_string(m_day);
-		//Math to scale title size and position with changing grid sizes
-		int scale{ (m_blackBorder*m_cellSize / 16) };
-		int y{ (m_blackBorder*m_cellSize / 2) - scale * 3 };
-		int x{ ((m_homeCount*m_cellSize / 2) - (scale * 8)) };
-		DrawString(x, y, title, olc::WHITE, scale);
-	}
+	std::string title = "Day #" + std::to_string(m_day);
+	//Math to scale title size and position with changing grid and border sizes
+	int textScale{ (m_blackBorder*m_cellSize / 16) };
+	int y{ (m_blackBorder*m_cellSize / 2) - textScale * 3 };
+	int x{ ((m_homeCount*m_cellSize / 2) - (textScale * static_cast<int>(title.length()))) };
+	DrawString(x, y, title, olc::WHITE, textScale);
 	
-	//Draw Home hopefully
+	//Draw Home
 	for (int x = m_blackBorder; x < m_homeCount + m_blackBorder; ++x)
 	{
 		for (int y = m_blackBorder; y < m_homeCount + m_blackBorder; ++y)
@@ -235,52 +247,105 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	for (int x = m_blackBorder+1; x < m_gridCount + m_blackBorder + 1; ++x)
 	{
 		for (int y = m_blackBorder + 1; y < m_gridCount + m_blackBorder + 1; ++y)
-		{
-			//FillRect(x * m_cellSize, y * m_cellSize, m_cellSize, m_cellSize, olc::BLACK);
-			//FillRect(x * m_cellSize, y * m_cellSize, m_cellSize - m_cellBorderWidth, m_cellSize - m_cellBorderWidth, olc::WHITE);
+		{;
 			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize, m_cellSize, olc::WHITE);
 		}
 	}
 
-	/*
-	//Draw Colour Bar in cells
-	for (int x = m_homeCount + 2*m_blackBorder; x < m_homeCount + 2*m_blackBorder + 2; ++x)
+	//Draw Colour Bar
 	{
-		int step{ 0 };
-		for (int y = m_blackBorder+1; y < m_gridCount + m_blackBorder; ++y)
-		{
-			olc::Pixel redToBlue((255 - step), 0, step);
-			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize + m_cellBorderWidth, m_cellSize + m_cellBorderWidth, olc::WHITE);
-			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize, m_cellSize, redToBlue);
-			step += (255 / m_homeCount);
-		}
-	}
-	*/
-
-	//Draw Colour Bar in lines
-	{
-		/*Colour bar changes from pastel red (max) to pastel blue (min)
-		Pastel Red = 255, 59, 48
-		Pastel Blue = 0, 122, 255
-		Code is uglier but result prettier*/
+		/*Colour bar changes from red (max) to magenta (mid) to blue (min)
+		Red = 228, 59, 68
+		Magenta = 228, 59, 152
+		Blue = 0, 149, 233 */
 		int x = ((m_homeCount + 2 * m_blackBorder)*m_cellSize);
 		double step_r{ 0.0 }, step_g{ 0.0 }, step_b{ 0.0 };
-		for (int y = (m_blackBorder + 1)*m_cellSize; y <= (m_gridCount + m_blackBorder+1)*m_cellSize; ++y)
+		int n{ 0 };
+		int yZero{ (m_blackBorder + 1)*m_cellSize }; // Where the colour bar starts
+		for (int y = yZero; y <= ((m_gridCount + m_blackBorder+1)*m_cellSize); ++y)
 		{
-			//olc::Pixel redToBlue((255 - step), 0, (step));
-			//olc::Pixel pastelRTB((255 - step_r), (59+step_g), (48+step_b));
-			olc::Pixel blobRTB(228 - step_r, 59 + step_g, 68 + step_b);
-			DrawLine(x, y, x + (2 * m_cellSize), y, blobRTB);
-			//step_r = step_r + (255.0 / (m_gridCount*m_cellSize));
-			//step_g = step_g + ((122.0-59.0) / (m_gridCount*m_cellSize));
-			//step_b = step_b + (207.0 / (m_gridCount*m_cellSize));
+			olc::Pixel blobRtMtB(228-step_r, 59+step_g, 68.0 + step_b);
+			DrawLine(x, y, x + (2 * m_cellSize), y, blobRtMtB);
+			++n;
 			
-			//Matches Blob sprites
-			step_r = step_r + (228.0 / (m_gridCount*m_cellSize));
-			step_g = step_g + ((149.0 - 59.0) / (m_gridCount*m_cellSize));
-			step_b = step_b + ((233.0-68.0) / (m_gridCount*m_cellSize));
+			if (n < (m_gridCount*m_cellSize) / 2)
+			{
+				step_b += ((152.0 - 68.0) / ((m_gridCount*m_cellSize) /2));
+			}
+			else if (n >= (m_gridCount*m_cellSize) / 2)
+			{
+				step_r += ((228.0) / ((m_gridCount*m_cellSize) /2));
+				step_g += ((149.0 - 59.0) / ((m_gridCount*m_cellSize) / 2));
+				step_b += ((233.0 - 152.0) / ((m_gridCount*m_cellSize) / 2));
+			}
 		}
 
+		//Write which blob stat the colour bar measures
+		std::string colourStatStr;
+		switch (m_colourStat)
+		{
+		case ColourStat::SIZE:
+			colourStatStr = "Size";
+			break;
+		case ColourStat::SPEED:
+			colourStatStr = "Speed";
+			break;
+		case ColourStat::SENSE:
+			colourStatStr = "Sense";
+			break;
+		default:
+			colourStatStr = "Size";
+			break;
+		}
+		int textScale{ m_blackBorder * m_cellSize / 16 };
+		DrawString((x - textScale * 6), (m_blackBorder*m_cellSize / 2), colourStatStr, olc::WHITE, textScale);
+
+		//Write max colour bar value
+		std::string maxValStr = std::to_string(m_colourBarMax);
+		maxValStr.resize(4);
+		textScale = (m_blackBorder*m_cellSize / 20);
+		DrawString((x - textScale*3), ((m_blackBorder+1)*m_cellSize - textScale*9), maxValStr, olc::WHITE, textScale);
+
+		//Write min colour bar value
+		DrawString(x - textScale * 3, (m_gridCount + m_blackBorder + 1)*m_cellSize + textScale * 2, "0.00", olc::WHITE, textScale);
+
+		// Draw mean value triangle
+		int avgStatIndex{ static_cast<int>(m_colourStat)-1 }; //index of average colour stat in m_avgBlobStats
+		double avgStatVal{ (m_avgBlobStats[m_day - 1][avgStatIndex]) };
+		int yMean = yZero + (1- avgStatVal/m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily mean value is
+		FillTriangle(x + (2.25* m_cellSize), yMean, x + (3.25*m_cellSize), yMean - (0.5*m_cellSize), x + (3.25*m_cellSize), yMean + (0.5*m_cellSize), olc::WHITE);
+		DrawString(x + (3.50 * m_cellSize), yMean - (0.75*m_cellSize), "Mean", olc::WHITE, textScale);
+		std::string avgValStr{ std::to_string(avgStatVal) };
+		avgValStr.resize(4);
+		DrawString(x + (3.50 * m_cellSize), yMean, avgValStr, olc::WHITE, textScale);
+
+		// Draw max value triangle
+		int maxStatIndex{ static_cast<int>(m_colourStat) +2 }; //index of max colour stat in m_avgBlobStats
+		double maxStatVal{ (m_avgBlobStats[m_day - 1][maxStatIndex]) };
+		int yMax = yZero + (1 - maxStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily max value is
+		//if the max val triangle doesn't overlap mean triangle, draw
+		if (std::abs(yMean - yMax) >= m_cellSize)
+		{
+			FillTriangle(x + (2.25* m_cellSize), yMax, x + (3.25 * m_cellSize), yMax - (0.5*m_cellSize), x + (3.25 * m_cellSize), yMax + (0.5*m_cellSize), olc::WHITE);
+			DrawString(x + (3.50 * m_cellSize), yMax - (0.75*m_cellSize), "Max", olc::WHITE, textScale);
+			std::string dailyMaxStr{ std::to_string(maxStatVal) };
+			dailyMaxStr.resize(4);
+			DrawString(x + (3.50 * m_cellSize), yMax, dailyMaxStr, olc::WHITE, textScale);
+		}
+ 
+		// Draw min value triangl
+		int minStatIndex{ static_cast<int>(m_colourStat) + 5 }; //index of min colour stat in m_avgBlobStats
+		double minStatVal{ (m_avgBlobStats[m_day - 1][minStatIndex]) };
+		int yMin = yZero + (1 - minStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily min value is
+		//if the min val triangle doesn't overlap mean triangle, draw
+		if (std::abs(yMean - yMin) >= m_cellSize)
+		{
+			FillTriangle(x + (2.25* m_cellSize), yMin, x + (3.25 * m_cellSize), yMin - (0.5*m_cellSize), x + (3.25 * m_cellSize), yMin + (0.5*m_cellSize), olc::WHITE);
+			DrawString(x + (3.50 * m_cellSize), yMin - (0.75*m_cellSize), "Min", olc::WHITE, textScale);
+			std::string dailyMinStr{ std::to_string(minStatVal) };
+			dailyMinStr.resize(4);
+			DrawString(x + (3.50 * m_cellSize), yMin, dailyMinStr, olc::WHITE, textScale);
+		}
 	}
 
 	//Draw Food onto map
@@ -289,28 +354,14 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	int appleScale{ m_cellSize / 8 };
 	for (Food food : m_eachFoodPositions[m_day])
 	{
-		//olc::Pixel green_custom{ 34, 139, 34, 0};//190
-		//FillCircle((food.getXPosition() + m_blackBorder+0.5)* m_cellSize, (food.getYPosition() + m_blackBorder+0.5)* m_cellSize, 0.4*m_cellSize, green_custom);
 		DrawSprite((food.getXPosition() + m_blackBorder)* m_cellSize, (food.getYPosition() + m_blackBorder)* m_cellSize, &greenApple, appleScale);
 	}
-
 	
 	//Draw Blobs onto map
-	sImageFile = "redBlob.png";
-	olc::Sprite redBlob (sImageFile);
-	sImageFile = "blueBlob.png";
-	olc::Sprite blueBlob(sImageFile);
-
 	for (auto element : (m_dailyBlobFrames[m_day])[m_frame])
 	{
-		/*Scaling function scales to 255, allows for pretty code here but
-		pure red to pure blue is ugly. Pastel to Pastel is nicer*/
-
-		double scaledSize{ (element[2]) };
-		//olc::Pixel blueToRed(scaledSize, 0, (255 - scaledSize));
-		//olc::Pixel pastelBTR(scaledSize, 122-(scaledSize/255*63.0), (255 - (scaledSize / 255 * 207.0)));
-		//FillRect((element[0] + m_blackBorder) * m_cellSize, (element[1] + m_blackBorder) * m_cellSize, m_cellSize - m_cellBorderWidth, m_cellSize - m_cellBorderWidth, pastelBTR);
-		//DrawSprite(((element[0] + m_blackBorder) * m_cellSize), (element[1] + m_blackBorder) * m_cellSize, &redBlob, 3);
+		int index{ static_cast<int>(m_colourStat) };
+		double scaledSize{ element[index] };
 		drawBlob(((element[0] + m_blackBorder) * m_cellSize), (element[1] + m_blackBorder) * m_cellSize, scaledSize);
 
 		//If Blob overlaps food, then remove food from foodPosition array
@@ -344,6 +395,7 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 
 	/*Can be used as a delay between each step if your computer is too fast
 	and the animation runs too quickly*/
+
 	//std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 	return true;

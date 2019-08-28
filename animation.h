@@ -8,6 +8,14 @@
 #include "simulationResults.h"
 #include "olcPixelGameEngine.h"
 
+enum class ColourStat
+{
+	SIZE = 2,
+	SPEED = 3,
+	SENSE = 4
+};
+
+
 class Animation : public olc::PixelGameEngine
 {
 private:
@@ -19,6 +27,9 @@ private:
 	int m_cellBorderWidth;
 	int m_day;
 	int m_frame;
+	double m_scaleRange;
+	ColourStat m_colourStat;
+	double m_colourBarMax;
 	simulationResults m_stats;
 	std::vector<std::vector<Food>> m_eachFoodPositions;
 	std::vector<std::vector<std::vector<std::array<double, 5>>>> m_dailyBlobFrames;
@@ -27,11 +38,11 @@ private:
 public:
 	Animation();
 
-	Animation(int cellCount, simulationResults &stats);
+	Animation(int cellCount, simulationResults &stats, ColourStat stat );
 
 	void fixCoords();
 
-	void scaleStats(int start, int end);
+	void scaleStats(double scaleRange);
 
 	void drawBlob(int x, int y, double scaledStat);
 

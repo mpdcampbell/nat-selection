@@ -34,18 +34,19 @@ int main()
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
 	//ENVIRONMENT VARIABLES
-	map.setMapSize(20); // integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{25}; //starting number of Blobs
+	map.setMapSize(10); // integer length, in grid spaces, of one side of the square map
+	int seedBlobCount{30}; //starting number of Blobs
 	int foodCount{ 30 }; // number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
-	g_mutationProb = 20; //integer probability of a blob stat mutating during replication
+	g_mutationProb = 20; //integer probability (%) of a blob stat mutating during replication
 	int dayCount{150}; // length of simulation in days
 	int simCount{1}; // number of repeat simulations run
 
 	//ANIMATION VARIABLES
-	int xResolution{ 900 };
 	int yResolution{ 720 };
+	int xResolution( yResolution*1.5);
+	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE which stat the blob colour coding refers to.
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
 	{
@@ -75,17 +76,17 @@ int main()
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day 
 	
-   //int firstSim{ 0 }, lastSim{ 0 }; //Which simulation runs to create histogram gifs for
+	//int firstSim{ 0 }, lastSim{ 0 }; //Which simulation runs to create histogram gifs for
 	
-  //makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
+	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
 	//ANIMATION
-	Animation blobSim(map.getMapSize(), stats);
+	Animation blobSim(map.getMapSize(), stats, colourStat);
 
 	if (blobSim.Construct(xResolution, yResolution, 1, 1))
 	{
 		blobSim.Start();
 	}
-	
+
 	return 0;
 }
