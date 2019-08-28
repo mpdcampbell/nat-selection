@@ -581,7 +581,7 @@ bool Blob::hasSurplusStamina()
 
 void Blob::mutate()
 	{
-	int prob{ 50 / g_mutationProb};
+	int prob{ 200/ g_mutationProb};
 	int num{ getRandomNumber(1, prob) };
 	if (num == 1) 
 	{

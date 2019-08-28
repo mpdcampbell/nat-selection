@@ -24,7 +24,6 @@ private:
 	int m_homeCount;
 	int m_gridCount;
 	int m_cellSize;
-	int m_cellBorderWidth;
 	int m_day;
 	int m_frame;
 	double m_scaleRange;
@@ -41,6 +40,8 @@ public:
 	Animation(int cellCount, simulationResults &stats, ColourStat stat );
 
 	void fixCoords();
+
+	void drawColourBar();
 
 	void scaleStats(double scaleRange);
 

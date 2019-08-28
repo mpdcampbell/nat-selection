@@ -15,7 +15,6 @@
 #include "animation.h"
 
 
-
 int main()
 {
 	srand(static_cast<unsigned int>(time(0))); // set initial seed value to system clock
@@ -30,23 +29,26 @@ int main()
 	double nativeEnergy{ 1500.0 };
 	double seedSize{ 3.0 }; 
 	double seedSpeed{ 3.0 };
-	double seedSense{ 6.0 }; 
+	double seedSense{ 5.0 }; 
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
 	//ENVIRONMENT VARIABLES
-	map.setMapSize(10); // integer length, in grid spaces, of one side of the square map
+	map.setMapSize(30); // integer length, in grid spaces, of one side of the square map
 	int seedBlobCount{30}; //starting number of Blobs
-	int foodCount{ 30 }; // number of food pieces place randomly on map daily
+	int foodCount{ 40 }; // number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
 	g_mutationProb = 20; //integer probability (%) of a blob stat mutating during replication
 	int dayCount{150}; // length of simulation in days
 	int simCount{1}; // number of repeat simulations run
 
+	//GRAPH VARIABLES
+	int firstSim{ 0 }, lastSim{ 0 }; //Which simulation runs to create histogram gifs for
+
 	//ANIMATION VARIABLES
-	int yResolution{ 720 };
+	int yResolution{ 720 }; //Animation window resolution in pixels
 	int xResolution( yResolution*1.5);
-	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE which stat the blob colour coding refers to.
+	ColourStat colourStat{ ColourStat::SENSE }; // SIZE, SPEED or SENSE which stat the blob colour coding refers to.
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
 	{
@@ -75,10 +77,7 @@ int main()
 	
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day 
-	
-	//int firstSim{ 0 }, lastSim{ 0 }; //Which simulation runs to create histogram gifs for
-	
-	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
+	makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
 	//ANIMATION
 	Animation blobSim(map.getMapSize(), stats, colourStat);
