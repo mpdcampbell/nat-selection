@@ -5,44 +5,46 @@
 #include "food.h"
 #include "blob.h"
 #include "simulation.h"
+#include "simulationResults.h"
 
 extern int g_nameHolder{ 0 };
 
-void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray)
+void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simulationResults &stats)
 {
 	bool staminaCheck;
 	do
 	{
 		staminaCheck = false;
 		int length{ static_cast<int>(blobArray.size()) };
+		//Before any steps are taken, capture the beginning frame
+		stats.recordBlobFrame(blobArray);
 		for (int i{ 0 }; i < length; ++i)
 		{
 			for (int step{ 0 }; step < blobArray[i].getSpeed(); ++step)
 			{
-				if (blobArray[i].getEnergy() > 0)
+				if (blobArray[i].getEnergy() >= blobArray[i].getCost())
 				{
-					std::string before = blobArray[i].getName();
-					std::optional<int> eatenBlob{ std::nullopt };
+					int foodEaten{ blobArray[i].getFoodEaten() };
+					std::optional<int> blobEaten{ std::nullopt };
 					staminaCheck = true;
-					if (blobArray[i].getFoodEaten() == 0)
+					if (foodEaten == 0)
 					{
-						eatenBlob = blobArray[i].huntOrRun(foodArray, blobArray);
+						blobEaten = blobArray[i].huntOrRun(blobArray, foodArray);
 					}
-					else if (blobArray[i].getFoodEaten() == 1 && blobArray[i].hasSurplusStamina())
+					else if (foodEaten == 1 && blobArray[i].hasSurplusStamina())
 					{
-						eatenBlob = blobArray[i].huntOrRun(foodArray, blobArray);
+						blobEaten = blobArray[i].huntOrRun(blobArray, foodArray);
 					}
 					else
 					{
 						blobArray[i].goHome();
 					}
-
 					//if a prey blob was eaten
-					if (eatenBlob.has_value())
+					if (blobEaten.has_value())
 					{
 						//adjust the loop size
 						--length;
-						if (i > eatenBlob.value())
+						if (i > blobEaten.value())
 						{
 							/*if the eaten blob was before the hunting blob in the array
 							then the hunting blob element value has been reduced by one,
@@ -51,8 +53,14 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray)
 							--i;
 						}
 					}
-					assert(before == blobArray[i].getName() && "Blob element tracking mistake");
-					blobArray[i].reduceEnergy();
+					/*If food was not eaten, reduce energy and record step.
+					otherwise the huntOrRun action was to eat, no step taken
+					so go back through the loop*/
+					else if (blobArray[i].getFoodEaten() == foodEaten)
+					{
+						blobArray[i].reduceEnergy();
+						stats.recordBlobFrame(blobArray);
+					}
 				}
 			}
 		}
@@ -68,6 +76,7 @@ void naturalSelection(std::vector<Blob> &blobArray)
 		// remember A->.function() is same as (*A).function()
 		if (!it->atHome() || !it->getFoodEaten())
 		{
+			//erase blob
 			it = blobArray.erase(it);
 		}
 		else
@@ -86,11 +95,11 @@ void breed(std::vector<Blob> &blobArray)
 		if (clone.has_value())
 		{
 			//To get correct number for new blob name
-			clone.value().setName("Blob #" + std::to_string(g_nameHolder++));
+			clone.value().setName(g_nameHolder);
+			++g_nameHolder;
 			blobArray.push_back(clone.value());
 		}
 	}
-
 }
 
 void digestAndSleep(std::vector<Blob> &blobArray)
@@ -101,21 +110,4 @@ void digestAndSleep(std::vector<Blob> &blobArray)
 		blobArray[i].setFoodEaten(0);
 		blobArray[i].sleep();
 	}
-}
-
-void ageBlobs(std::vector<Blob> &blobArray)
-{
-	for (int i{ 0 }; i < blobArray.size(); ++i)
-	{
-		blobArray[i].setAge(blobArray[i].getAge() + 1);
-	}
-}
-
-void blobsCarryOutDay(std::vector<Blob> &blobArray, std::vector<Food> &foodArray)
-{
-	walkAndEat(blobArray, foodArray);
-	naturalSelection(blobArray);
-	breed(blobArray);
-	digestAndSleep(blobArray);
-	ageBlobs(blobArray);
 }

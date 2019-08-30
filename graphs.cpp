@@ -5,19 +5,6 @@
 #include "gnuplot-iostream.h"
 #include "graphs.h"
 
-double getMax(std::vector<double> &vector)
-{
-	double max = vector[0];
-	for (int i = 0; i < vector.size(); i++)
-	{
-		if (max < vector[i])
-		{
-			max = vector[i];
-		}
-	}
-	return max;
-}
-
 void makeAvgGraphs(simulationResults &stats)
 {
 	std::cout << "Making graph of mean stat values over time...\n";
@@ -107,7 +94,6 @@ void makeAvgGraphs(simulationResults &stats)
 	gp << "unset key\n";
 	gp << "set xlabel 'Days'\n";
 
-
 	// Population plot
 	gp << "set ylabel 'Blob Population'\n";
 	gp << "set yrange[0:" << (maxPop + (10)) << "]\n";
@@ -192,7 +178,7 @@ void makeHistogram(simulationResults &stats, int firstSim, int lastSim)
 {
 	assert(lastSim >= firstSim && "Value of firstSim is greater than lastSim");
 
-	std::cout << "Making animated histogram of each stats population distrubution...\n";
+	std::cout << "Making animated histogram of each stats population distribution...\n";
 
 	//Get maximum values for x ranges and y range
 	double maxPop = 0;

@@ -12,6 +12,8 @@
 #include "simulationResults.h"
 #include "graphs.h"
 #include "simulation.h"
+#include "animation.h"
+
 
 int main()
 {
@@ -22,50 +24,68 @@ int main()
 	std::vector<Blob> blobArray;
 	std::vector<Food> foodArray;
 	simulationResults stats;
-	
+
 	//INITIAL BLOB STATS
-	double nativeEnergy{ 2000.0 };
-	double seedSize{ 3.0 }; 
+	double nativeEnergy{ 1500.0 };
+	double seedSize{ 3.0 };
 	double seedSpeed{ 3.0 };
-	double seedSense{ 3.0 }; 
+	double seedSense{ 5.0 };
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
+	//ENVIRONMENT VARIABLES
+	map.setMapSize(15); // integer length, in grid spaces, of one side of the square map
+	int seedBlobCount{ 10 }; //starting number of Blobs
+	int foodCount{ 20 }; // number of food pieces place randomly on map daily
+
 	//SIMULATION VARIABLES
-	g_mutationProb = 20; //Int Probability of a blob stat mutating during replication
-	map.setMapSize(30); // Int length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 40 }; //starting number of Blobs
-	int foodCount{80}; // number of food pieces place randomly on map daily
-	int dayCount{1000}; // length of simulation in days
-	int simCount{6}; // number of repeat simulations run
+	g_mutationProb = 20; //integer probability (%) of a blob stat mutating during replication
+	int dayCount{ 150 }; // length of simulation in days
+	int simCount{ 1 }; // number of repeat simulations run
+
+	//GRAPH VARIABLES
+	int firstSim{ 0 }, lastSim{ 0 }; //Which simulation runs to create histogram gifs for
+
+	//ANIMATION VARIABLES
+	int yResolution{ 800 }; //Animation window resolution in pixels
+	int xResolution(yResolution*1.5);
+	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE which stat the blob colour coding refers to.
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
 	{
-		g_nameHolder = seedBlobCount; //For specific blob naming, allows error tracking
+		g_nameHolder = seedBlobCount + 1; //For specific blob naming, allows error tracking
 		blobArray = map.populateBlobs(seedBlob, seedBlobCount);
 		foodArray = map.populateFood(foodCount);
-
+		
 		for (int day{ 0 }; day < dayCount; ++day)
 		{
+			stats.recordDay(blobArray, foodArray);
 			std::cout << "Run #" << sim << ", Day #" << day << "\n";
 			//a check to end early incase of extinction
 			if (blobArray.size() == 0)
 			{
-				std::cout << "Extinction on day " << day << "\n";
+				std::cout << "Extinction at end of day " << day-1 << "\n";
 				break;
 			}
-			stats.recordDay(blobArray);
-			blobsCarryOutDay(blobArray, foodArray);
+			walkAndEat(blobArray, foodArray, stats);
+			naturalSelection(blobArray);
+			breed(blobArray);
+			digestAndSleep(blobArray);
 			foodArray = map.populateFood(foodCount);
 		}
 		stats.recordSim();
 	}
-	
+
 	//GRAPHS OUTPUT
-	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day 
-	
-	int firstSim{ 0 }, lastSim{ 0 }; //Which simulation runs to create histogram gifs for
-	
-	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
+	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day
+	makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
+
+	//ANIMATION
+	Animation blobSim(map.getMapSize(), stats, colourStat);
+
+	if (blobSim.Construct(xResolution, yResolution, 1, 1))
+	{
+		blobSim.Start();
+	}
 
 	return 0;
 }

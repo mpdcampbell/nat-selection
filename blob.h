@@ -5,6 +5,7 @@
 #include <string>
 #include <optional>
 #include <vector>
+#include <array>
 #include "thing.h"
 #include "food.h"
 
@@ -19,17 +20,19 @@ protected:
 	double m_speed;
 	double m_size;
 	int m_foodEaten = 0;
-	int m_age;
 	int m_mapSize;
+	int m_name;
+	int m_birthday;
 
 public:
+
 	Blob();
 
 	Blob(double nativeEnergy, double size, double speed, double sense);
 
-	std::string getName();
+	int getName();
 
-	void setName(std::string name);
+	void setName(int name);
 
 	double getSense();
 
@@ -53,13 +56,11 @@ public:
 
 	void setMapSize(int x);
 
+	int getMapSize();
+
 	int getFoodEaten();
 
 	void setFoodEaten(int x);
-
-	int getAge();
-
-	void setAge(int x);
 
 	void sleep();
 
@@ -79,7 +80,7 @@ public:
 
 	bool atFood(Food &food);
 
-	std::optional<int> huntOrRun(std::vector<Food> &foodArray, std::vector<Blob> &blobArray);
+	std::optional<int> huntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
 	
 	int distToObject(Thing &object);
 
