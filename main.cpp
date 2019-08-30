@@ -68,7 +68,7 @@ int main()
 			}
 			walkAndEat(blobArray, foodArray, stats);
 			naturalSelection(blobArray);
-			breed(blobArray, day);
+			breed(blobArray);
 			digestAndSleep(blobArray);
 			foodArray = map.populateFood(foodCount);
 		}

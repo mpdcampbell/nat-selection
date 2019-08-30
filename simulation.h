@@ -12,7 +12,7 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simu
 
 void naturalSelection(std::vector<Blob> &blobArray);
 
-void breed(std::vector<Blob> &blobArray, int day);
+void breed(std::vector<Blob> &blobArray);
 
 void digestAndSleep(std::vector<Blob> &blobArray);
 

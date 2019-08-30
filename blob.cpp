@@ -99,54 +99,9 @@ void Blob::setFoodEaten(int x)
 	m_foodEaten = x;
 }
 
-int Blob::getBirthday()
-{
-	return m_birthday;
-}
-
-void Blob::setBirthday(int day)
-{
-	m_birthday = day;
-}
-
 void Blob::sleep()
 {
 	m_energy = m_nativeEnergy;
-}
-
-std::vector<std::array<int, 2>>& Blob::getPath()
-{
-	return m_path;
-}
-
-void Blob::setPath(std::vector<std::array<int, 2>> &path)
-{
-	m_path = path;
-}
-
-void Blob::recordPath()
-{
-	std::array<int, 2> position{ m_xPosition, m_yPosition };
-	m_path.push_back(position);
-}
-
-void Blob::pushDaysPath()
-{
-	m_totalPath.push_back(m_path);
-	/*for (auto path : m_totalPath)
-	{
-		std::cout<< m_name << ": Day "<<day<<"\n";
-		for (std::array<int, 2> position : path)
-		{
-			std::cout << m_name << ": " << position[0] << ", " << position[1] << "\n";
-		}
-		++day;
-	}*/
-}
-
-std::vector<std::vector<std::array<int,2>>>& Blob::getTotalPath()
-{
-	return m_totalPath;
 }
 
 /*Using convention that North and East are +ve and 

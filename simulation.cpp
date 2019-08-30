@@ -86,7 +86,7 @@ void naturalSelection(std::vector<Blob> &blobArray)
 	}
 }
 
-void breed(std::vector<Blob> &blobArray, int day)
+void breed(std::vector<Blob> &blobArray)
 {
 	int length{ static_cast<int>(blobArray.size()) };
 	for (int i{ 0 }; i < length; ++i)
@@ -96,9 +96,6 @@ void breed(std::vector<Blob> &blobArray, int day)
 		{
 			//To get correct number for new blob name
 			clone.value().setName(g_nameHolder);
-			clone.value().setBirthday(day);
-			//To prevent carrying through path of ancestors
-			clone.value().getTotalPath().clear();
 			++g_nameHolder;
 			blobArray.push_back(clone.value());
 		}
