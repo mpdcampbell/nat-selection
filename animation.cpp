@@ -93,10 +93,11 @@ void Animation::drawBlob(int x, int y, double s)
 	olc::Pixel blackBTR;
 	olc::Pixel white{ 255,255,255,255 };
 
-	double t = (s / m_scaleRange)*2;
+	double t;
 
 	if (s <= m_scaleRange / 2.0)
 	{
+		t = (s /m_scaleRange)*2;
 		olc::Pixel temp1(44.0 + (t*202.0), 232.0 - (t*115.0), (245.0 - (t*59.0)));
 		lightBTR = temp1;
 		olc::Pixel temp2(t*228.0, 149.0 - (t * 90.0), 233.0 - (t * 81.0));
@@ -108,6 +109,7 @@ void Animation::drawBlob(int x, int y, double s)
 	}
 	if (s > m_scaleRange / 2.0)
 	{
+		t = (2 * s / m_scaleRange) - 1;
 		olc::Pixel temp1(228.0, 59.0, (186.0 - (t*64.0)));
 		lightBTR = temp1;
 		olc::Pixel temp2(228.0, 59.0, 152.0 - (t * 84.0));
@@ -249,7 +251,7 @@ void Animation::drawColourBar()
 
 	// Draw mean value triangle
 	int avgStatIndex{ static_cast<int>(m_colourStat) - 1 }; //index of average colour stat in m_avgBlobStats
-	double avgStatVal{ (m_avgBlobStats[m_day - 1][avgStatIndex]) };
+	double avgStatVal{ (m_avgBlobStats[m_day-1][avgStatIndex]) };
 	int yMean = yZero + (1 - avgStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily mean value is
 	FillTriangle(x + (2.25* m_cellSize), yMean, x + (3.25*m_cellSize), yMean - (0.5*m_cellSize), x + (3.25*m_cellSize), yMean + (0.5*m_cellSize), olc::WHITE);
 	DrawString(x + (3.50 * m_cellSize), yMean - (0.75*m_cellSize), "Mean", olc::WHITE, textScale);
@@ -259,7 +261,7 @@ void Animation::drawColourBar()
 
 	// Draw max value triangle
 	int maxStatIndex{ static_cast<int>(m_colourStat) + 2 }; //index of max colour stat in m_avgBlobStats
-	double maxStatVal{ (m_avgBlobStats[m_day - 1][maxStatIndex]) };
+	double maxStatVal{ (m_avgBlobStats[m_day-1][maxStatIndex]) };
 	int yMax = yZero + (1 - maxStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily max value is
 	//if the max val triangle doesn't overlap mean triangle, draw
 	if (std::abs(yMean - yMax) >= m_cellSize)
@@ -273,7 +275,7 @@ void Animation::drawColourBar()
 
 	// Draw min value triangl
 	int minStatIndex{ static_cast<int>(m_colourStat) + 5 }; //index of min colour stat in m_avgBlobStats
-	double minStatVal{ (m_avgBlobStats[m_day - 1][minStatIndex]) };
+	double minStatVal{ (m_avgBlobStats[m_day-1][minStatIndex]) };
 	int yMin = yZero + (1 - minStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily min value is
 	//if the min val triangle doesn't overlap mean triangle, draw
 	if (std::abs(yMean - yMin) >= m_cellSize)
@@ -285,7 +287,6 @@ void Animation::drawColourBar()
 		DrawString(x + (3.50 * m_cellSize), yMin, dailyMinStr, olc::WHITE, textScale);
 	}
 }
-
 
 bool Animation::OnUserCreate()
 {
@@ -318,7 +319,7 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	{
 		return true;
 	}
-
+	
 	//Clear Screen
 	FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
 

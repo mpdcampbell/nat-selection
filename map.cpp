@@ -1,12 +1,13 @@
 #include <vector>
 #include <array>
 #include <string>
+#include <cassert>
 #include "food.h"
 #include "blob.h"
 #include "randNum.h"
 #include "map.h"
 
-Map::Map() : m_size{ 50 }
+Map::Map() : m_size{ 20 }
 {
 }
 
@@ -16,7 +17,16 @@ Map::Map(int size) : m_size{ size }
 
 void Map::setMapSize(int x)
 {
-	m_size = x;
+	if (x >= 2)
+	{
+		m_size = x;
+	}
+	else
+	{
+		std::cout << "Map size must be at least 2 to create a grid for simulation";
+		m_size = 2;
+	}
+	
 }
 
 int Map::getMapSize()
@@ -51,7 +61,7 @@ std::array<int, 2> Map::getEdgePosition()
 	}
 	case 2:
 	{
-		xy[0] = 11;
+		xy[0] = m_size+1;
 		xy[1] = getRandomNumber(0, m_size + 1);
 		break;
 
@@ -65,7 +75,7 @@ std::array<int, 2> Map::getEdgePosition()
 	case 4:
 	{
 		xy[0] = getRandomNumber(0, m_size + 1);
-		xy[1] = 11;
+		xy[1] = m_size+1;
 		break;
 	}
 	}
@@ -81,7 +91,6 @@ std::vector<Blob> Map::populateBlobs(Blob &blob, int amount)
 		std::array<int, 2> xy{ getEdgePosition() };
 		blob.setName(i+1);
 		blob.setPosition(xy[0], xy[1]);
-		//blob.recordPath();
 		blobArray.push_back(blob);
 	}
 	return blobArray;

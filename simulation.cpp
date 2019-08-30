@@ -16,11 +16,13 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simu
 	{
 		staminaCheck = false;
 		int length{ static_cast<int>(blobArray.size()) };
+		//Before any steps are taken, capture the beginning frame
+		stats.recordBlobFrame(blobArray);
 		for (int i{ 0 }; i < length; ++i)
 		{
 			for (int step{ 0 }; step < blobArray[i].getSpeed(); ++step)
 			{
-				if (blobArray[i].getEnergy() > 0)
+				if (blobArray[i].getEnergy() >= blobArray[i].getCost())
 				{
 					int foodEaten{ blobArray[i].getFoodEaten() };
 					std::optional<int> blobEaten{ std::nullopt };
