@@ -15,7 +15,7 @@ This is a recreation of the natural selection simulation demonstrated in a [yout
  
 
 #### **Simulation Rules** 
-The simulation creates a squared grid "map", with "blob" creatures living at the edges, and randomly populates it with "food". Each day the blob creatures leave home to hunt for food. If a blob eats one food object and makes it home, it will survive to the next day. If a blob eats two "food" and makes it home then they reproduce asexually. Each blob has three traits to help it hunt food:
+The simulation creates a squared grid map, with "blob" creatures living at the edges, and randomly populates it with food. Each day the blob creatures leave home to hunt for food. If a blob eats one food object and makes it home, it will survive to the next day. If a blob eats two "food" and makes it home then they reproduce asexually. Each blob has three traits to help it hunt food:
  - Size  - A blob can eat another blob so long as the prey is 20% smaller than it.
  - Speed - The number of grid spaces or "steps" it can take at once.
  - Sense - The radius of grid spaces around it that a blob can see. 
