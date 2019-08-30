@@ -1,5 +1,5 @@
 # nat-selection
-This is a recreation of the natural selection simulation demonstrated in a [youtube video](https://www.youtube.com/watch?v=0ZGbIKd0XrM). Primer has his own [github repository](https://github.com/Helpsypoo/primer), but none of his code was used here. The idea was to copy the simulation "rules" set out in the video and independently recreate it in C++. The code does not animate the simulation but uses [gnuplot](http://www.gnuplot.info/), via the [gnuplot-iostream api](https://github.com/dstahlke/gnuplot-iostream), to produce plots of how the population number and traits changed.
+This is a recreation of the natural selection simulation demonstrated in a [youtube video](https://www.youtube.com/watch?v=0ZGbIKd0XrM). Primer has his own [github repository](https://github.com/Helpsypoo/primer), but none of his code was used here. The idea was to copy the simulation "rules" set out in the video and independently recreate it in C++. The code produces a 2D animation of the simulation, using the [olcPixelGameEngine library](https://github.com/OneLoneCoder/olcPixelGameEngine), where blob colour represents the value of a chosen trait. But while attention grabbing, this is not very informative in comparison to the graphs produced. [Gnuplot](http://www.gnuplot.info/) is used, via the [gnuplot-iostream api](https://github.com/dstahlke/gnuplot-iostream), to produce plots of how the population number and creature traits change across simulation.
 
 #### **Example Graphs**
 
@@ -9,6 +9,10 @@ This is a recreation of the natural selection simulation demonstrated in a [yout
 <p align="center">
 <img align="center" src="/example-graphs/StatDistribution_Sim0.gif" alt="Trait distribution for a given simulation" title="Trait distribution for a given simulation" width="450"><br \>
  </p>
+ 
+ #### **Example Animation**
+ 
+ 
 
 #### **Simulation Rules** 
 The simulation creates a squared grid "map", with "blob" creatures living at the edges, and randomly populates it with "food". Each day the blob creatures leave home to hunt for food. If a blob eats one food object and makes it home, it will survive to the next day. If a blob eats two "food" and makes it home then they reproduce asexually. Each blob has three traits to help it hunt food:
