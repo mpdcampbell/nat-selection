@@ -27,6 +27,7 @@ private:
 	int m_day;
 	int m_frame;
 	double m_scaleRange;
+	bool m_paused;
 	ColourStat m_colourStat;
 	double m_colourBarMax;
 	simulationResults m_stats;
