@@ -10,11 +10,18 @@ This is a recreation of the natural selection simulation demonstrated in a [yout
 <img align="center" src="/examples/StatDistribution_Sim0.gif" alt="Trait distribution for a given simulation" title="Trait distribution for a given simulation" width="450"><br \>
  </p>
  
- #### **Example Animation**
- 
- 
+ #### **Example Animations**
+ <p align="center">
+ <img align ="center" src="/examples/blobColours.png" alt="Blob creature art" title="Blob creature art" width="270"><br \>
+</p>
 
-#### **Simulation Rules** 
+<p align="center">
+ <img src="/examples/mapSize8_25fps.gif" alt="" title="Simulation with mapSize of 8 (64 grid spaces)" width="409"  />
+ <img src="/examples/test.png" alt="" title="" width ="200" />
+ <img src="/examples/mapSize25_25fps.gif" alt="" title="Simulation with mapSize of 25 (125 grid spaces)" width="342" /><br \>
+</p>
+
+### **Simulation Rules** 
 The simulation creates a squared grid map, with "blob" creatures living at the edges, and randomly populates it with food. Each day the blob creatures leave home to hunt for food. If a blob eats one food object and makes it home, it will survive to the next day. If a blob eats two "food" and makes it home then they reproduce asexually. Each blob has three traits to help it hunt food:
  - Size  - A blob can eat another blob so long as the prey is 20% smaller than it.
  - Speed - The number of grid spaces or "steps" it can take at once.
@@ -30,8 +37,8 @@ However, each of these traits has an energy cost. A blob starts each day with an
   #### gnuplot installation
 The latest version of gnuplot can be found [here](http://www.gnuplot.info/download.html), last tested version [here](https://sourceforge.net/projects/gnuplot/files/gnuplot/5.2.7/). Gnuplot just needs to be installed on the system such that "gnuplot" is a recognised command in cmd/terminal. In windows (my system) I used the "*gp527-win64-mingw.exe*" installer, ensuring to check the "*Add application directory to your PATH environment variable*" option. Otherwise gnuplot cannot be called from cmd.
 
-  #### gnuplot-iostream.h
-The code utilises the brilliant gnuplot-iostream api, which is contained entirely within one [large header file](https://github.com/dstahlke/gnuplot-iostream/blob/master/gnuplot-iostream.h). Download the header file and place it in the same folder as the other header files, that's it. If you want to place the header file elsewhere, for example a folder called headers where you keep headers useful for future use, ensure to add the folder path to the include path in your IDE. 
+  #### gnuplot-iostream.h   
+The code utilises the gnuplot-iostream api, which is contained entirely within one [large header file](https://github.com/dstahlke/gnuplot-iostream/blob/master/gnuplot-iostream.h). Download the header file and place it in the same folder as the other header files, that's it. If you want to place the header file elsewhere, for example a folder called headers where you keep headers useful for future use, ensure to add the folder path to the include path in your IDE. 
 
   #### boost libraries
 The gnuplot-iosteam api is dependent on the boost libraries. The boost header (.h) files must be visible to the compiler, and the library (.lib and .dll) files visible to the linker. If they are not made available to the IDE the code will not compile. The following instructions are for Visual Studio (the IDE I used).
@@ -41,6 +48,10 @@ The gnuplot-iosteam api is dependent on the boost libraries. The boost header (.
 - To add the library files, in the toolbar open *Project -> Properties -> Linker -> General -> Additional Library Directories*
 -  Click the dropdown arrow then *<Edit...>* and add the path to the *lib* and *lib64-msvc-14.1* folders, e.g. *C:\boost_1_70_0\lib* and *C:\boost_1_70_0\lib64-msvc-14.1* 
 
+  #### olcPixelGameEngine.h
+The animation is generated with the olcPixelGameEngine library, which is also contained entirely within one [large header file](https://github.com/OneLoneCoder/olcPixelGameEngine/blob/master/olcPixelGameEngine.h). Download the header file and place it in the same folder as the other header files, that's it. If you want to place the header file elsewhere, for example a folder called headers where you keep headers useful for future use, ensure to add the folder path to the include path in your IDE. 
+
 **Note:** I kept encountering linker errors with the \lib files when trying x86 builds within Visual Studio. Not sure wether this is a boost library problem, a problem with gnuplot-iostream on windows, or my own mistake. But rather than fix it, I just removed the lib path (kept the lib64 path) and always compiled x64 builds.
 
-
+## Art
+The pixel art for the blob creatures and food were both adapted from free resources on itch.io, found [here](https://stealthix.itch.io/animated-slimes) and [here](https://vectorpixelstar.itch.io/8x8px-icons) respectively.
