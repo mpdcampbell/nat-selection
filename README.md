@@ -3,11 +3,11 @@ This is a recreation of the natural selection simulation demonstrated in a [yout
 
 #### **Example Graphs**
 
- <img align="left" src="/example-graphs/AverageChange.png" alt="Average change plot for a single simulation" title="Average change plot for a single simulation" width="400"  /> 
- <img align="right" src="/example-graphs/AverageChange_10runs.png" alt="Average change plot for 10 repeat simulation runs" title="Average change plot for 10 repeat simulation runs" width="400" />
+ <img align="left" src="/examples/AverageChange.png" alt="Average change plot for a single simulation" title="Average change plot for a single simulation" width="400"  /> 
+ <img align="right" src="/examples/AverageChange_10runs.png" alt="Average change plot for 10 repeat simulation runs" title="Average change plot for 10 repeat simulation runs" width="400" />
 
 <p align="center">
-<img align="center" src="/example-graphs/StatDistribution_Sim0.gif" alt="Trait distribution for a given simulation" title="Trait distribution for a given simulation" width="450"><br \>
+<img align="center" src="/examples/StatDistribution_Sim0.gif" alt="Trait distribution for a given simulation" title="Trait distribution for a given simulation" width="450"><br \>
  </p>
  
  #### **Example Animation**
