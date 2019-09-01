@@ -32,13 +32,17 @@ However, each of these traits has an energy cost. A blob starts each day with an
  ## External requirements
   - Install gnuplot *(last tested with version 5.2.7)*
   - Include gnuplot-iostream.h *(tested with last file commit on 11/04/19)*
+  - Include olcPixelGameEngine.h *(tested with last file commit on 18/04/19)*
   - The boost C++ libraries *(tested with version 1.70.0)*
 
   #### gnuplot installation
 The latest version of gnuplot can be found [here](http://www.gnuplot.info/download.html), last tested version [here](https://sourceforge.net/projects/gnuplot/files/gnuplot/5.2.7/). Gnuplot just needs to be installed on the system such that "gnuplot" is a recognised command in cmd/terminal. In windows (my system) I used the "*gp527-win64-mingw.exe*" installer, ensuring to check the "*Add application directory to your PATH environment variable*" option. Otherwise gnuplot cannot be called from cmd.
 
-  #### gnuplot-iostream.h   
+  #### gnuplot-iostream.h 
 The code utilises the gnuplot-iostream api, which is contained entirely within one [large header file](https://github.com/dstahlke/gnuplot-iostream/blob/master/gnuplot-iostream.h). Download the header file and place it in the same folder as the other header files, that's it. If you want to place the header file elsewhere, for example a folder called headers where you keep headers useful for future use, ensure to add the folder path to the include path in your IDE. 
+
+  #### olcPixelGameEngine.h
+The animation is generated with the olcPixelGameEngine library, which is also contained entirely within one [large header file](https://github.com/OneLoneCoder/olcPixelGameEngine/blob/master/olcPixelGameEngine.h). Download the header file and place it in the same folder as the other header files, that's it. If you want to place the header file elsewhere, for example a folder called headers where you keep headers useful for future use, ensure to add the folder path to the include path in your IDE.
 
   #### boost libraries
 The gnuplot-iosteam api is dependent on the boost libraries. The boost header (.h) files must be visible to the compiler, and the library (.lib and .dll) files visible to the linker. If they are not made available to the IDE the code will not compile. The following instructions are for Visual Studio (the IDE I used).
@@ -47,9 +51,6 @@ The gnuplot-iosteam api is dependent on the boost libraries. The boost header (.
 - Click the dropdown arrow then *<Edit...>* and add the path to the overall boost folder, in my case *C:\boost_1_70_0* 
 - To add the library files, in the toolbar open *Project -> Properties -> Linker -> General -> Additional Library Directories*
 -  Click the dropdown arrow then *<Edit...>* and add the path to the *lib* and *lib64-msvc-14.1* folders, e.g. *C:\boost_1_70_0\lib* and *C:\boost_1_70_0\lib64-msvc-14.1* 
-
-  #### olcPixelGameEngine.h
-The animation is generated with the olcPixelGameEngine library, which is also contained entirely within one [large header file](https://github.com/OneLoneCoder/olcPixelGameEngine/blob/master/olcPixelGameEngine.h). Download the header file and place it in the same folder as the other header files, that's it. If you want to place the header file elsewhere, for example a folder called headers where you keep headers useful for future use, ensure to add the folder path to the include path in your IDE. 
 
 **Note:** I kept encountering linker errors with the \lib files when trying x86 builds within Visual Studio. Not sure wether this is a boost library problem, a problem with gnuplot-iostream on windows, or my own mistake. But rather than fix it, I just removed the lib path (kept the lib64 path) and always compiled x64 builds.
 
