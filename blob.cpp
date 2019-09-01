@@ -535,7 +535,7 @@ bool Blob::hasSurplusStamina()
 }
 
 void Blob::mutate()
-	{
+{
 	int prob{ 200/ g_mutationProb};
 	int num{ getRandomNumber(1, prob) };
 	if (num == 1) 
@@ -595,8 +595,6 @@ std::optional<Blob> Blob::tryToReplicate()
 	{
 		setFoodEaten(0);
 		Blob child = *this;
-		/*would prefer a mutated child was born rather than a
-		clone made and then mutated.*/
 		child.mutate();
 		return child;
 	}
