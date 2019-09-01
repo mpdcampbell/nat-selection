@@ -123,14 +123,6 @@ void Animation::drawBlob(int x, int y, double s)
 	int i;
 	int b = m_cellSize / 8;
 
-	/*
-	olc::Pixel lightBTR(44.0 + (t*202.0), 232.0 - (t*115.0), (245.0 - (t*123.0)));
-	olc::Pixel midBTR(t*228.0, 149.0 - (t * 90.0), 233.0 - (t * 165));
-	olc::Pixel darkBTR(18.0 + (t * 140), 78.0 - (t * 38.0), 137.0 - (t*84.0));
-	olc::Pixel blackBTR(38.0 + (t * 30), 43.0 + (t*6.0), 68.0 - (t * 30.0));
-	olc::Pixel white(255, 255, 255, 255);
-	*/
-
 	//y
 	for (i = 0; i < b; ++i)
 	{
@@ -273,7 +265,7 @@ void Animation::drawColourBar()
 		DrawString(x + (3.50 * m_cellSize), yMax, dailyMaxStr, olc::WHITE, textScale);
 	}
 
-	// Draw min value triangl
+	// Draw min value triangle
 	int minStatIndex{ static_cast<int>(m_colourStat) + 5 }; //index of min colour stat in m_avgBlobStats
 	double minStatVal{ (m_avgBlobStats[m_day-1][minStatIndex]) };
 	int yMin = yZero + (1 - minStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily min value is
@@ -300,6 +292,7 @@ bool Animation::OnUserCreate()
 	m_day = 1;
 	m_frame = 0;
 	m_scaleRange = 100.0;
+	m_paused = false;
 
 	if (m_cellSize < 8)
 	{
@@ -314,8 +307,12 @@ bool Animation::OnUserCreate()
 
 bool Animation::OnUserUpdate(float fElapsedTime)
 {
-	//Hold space key to pause animation
-	if (GetKey(olc::Key::SPACE).bHeld)
+	//Press P key to pause and unpause the animation
+	if (GetKey(olc::Key::P).bPressed)
+	{
+		m_paused = (!m_paused);
+	}
+	if (m_paused)
 	{
 		return true;
 	}
