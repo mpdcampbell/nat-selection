@@ -46,6 +46,8 @@ public:
 
 	void scaleStats(double scaleRange);
 
+	void interpolateFrames(int numFrames);
+
 	void drawBlob(int x, int y, double scaledStat);
 
 	bool OnUserCreate() override;

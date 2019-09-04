@@ -85,6 +85,54 @@ void Animation::scaleStats(double scaleRange)
 	}
 }
 
+void Animation::interpolateFrames(int numFrames)
+{
+	std::vector<std::vector<std::vector<std::array<double, 5>>>> tempDailyFrameArray;
+	std::vector< std::vector<std::array<double, 5>>> tempFrameArray;
+	
+	for (auto day : m_dailyBlobFrames)
+	{
+		int frameCount{ static_cast<int>(day.size())};
+		for (int i{ 0 }; i<frameCount-1; ++i)
+		{
+			int blobCount{ static_cast<int>(day[i].size()) };
+			std::vector<std::array<double, 5>> iFrame;
+			iFrame = day[i];
+			for (int j{ 0 }; j < blobCount; ++j)
+			{
+				std::array<double, 2> positionOne{ day[i][j][0], day[i][j][1] };
+				std::array<double, 2> positionTwo{ day[i+1][j][0], day[i+1][j][1] };				
+				if (positionOne != positionTwo)
+				{
+					if (positionOne[0] != positionTwo[0])
+					{
+						double increment{ ((positionTwo[0] - positionOne[0]) / numFrames) };
+						for (int k{ 0 }; k<numFrames; ++k)
+						{
+							iFrame[j][0] = positionOne[0] + (increment*k);
+							tempFrameArray.push_back(iFrame);
+						}						
+					}
+					else if (positionOne[1] != positionTwo[1])
+					{
+						double increment{ ((positionTwo[1] - positionOne[1]) / numFrames) };
+						for (int k{ 0 }; k < numFrames; ++k)
+						{
+							iFrame[j][1] = positionOne[1] + (increment*k);
+							tempFrameArray.push_back(iFrame);
+						}
+					}
+					j = blobCount;
+				}
+			}
+		}
+		tempDailyFrameArray.push_back(tempFrameArray);
+		tempFrameArray.clear();
+	}
+	//m_dailyBlobFrames.clear();
+	m_dailyBlobFrames = tempDailyFrameArray;
+}
+
 void Animation::drawBlob(int x, int y, double s)
 {
 	olc::Pixel lightBTR;
@@ -302,6 +350,7 @@ bool Animation::OnUserCreate()
 
 	fixCoords();
 	scaleStats(m_scaleRange);
+	interpolateFrames(5);
 	return true;
 }
 

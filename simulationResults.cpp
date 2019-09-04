@@ -137,7 +137,6 @@ void simulationResults::recordSim()
 	m_manySimEach.push_back(m_eachBlobStats);
 	m_avgBlobStats.clear();
 	m_eachBlobStats.clear();
-
 }
 
 std::vector<std::array<double, 10>>& simulationResults::getAvgBlobStats()
