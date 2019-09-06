@@ -29,16 +29,16 @@ int main()
 	double nativeEnergy{ 1500.0 };
 	double seedSize{ 3.0 };
 	double seedSpeed{ 3.0 };
-	double seedSense{ 5.0 };
+	double seedSense{ 3.0 };
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
 	//ENVIRONMENT VARIABLES
-	map.setMapSize(10); //Integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 20 }; //Starting number of Blobs
-	int foodCount{ 40 }; //Number of food pieces place randomly on map daily
+	map.setMapSize(20); //Integer length, in grid spaces, of one side of the square map
+	int seedBlobCount{ 40 }; //Starting number of Blobs
+	int foodCount{30}; //Number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
-	g_mutationProb = 20; //Integer probability (%) of a blob stat mutating during replication
+	g_mutationProb = 40; //Integer probability (%) of a blob stat mutating during replication
 	int dayCount{ 100 }; //Length of simulation in days
 	int simCount{ 1 }; //Number of repeat simulations run
 
@@ -46,8 +46,8 @@ int main()
 	int firstSim{ 0 }, lastSim{ 0 }; //Range of simulation runs to create histogram gifs for
 
 	//ANIMATION VARIABLES
-	int yResolution{ 540 }; //Animation window resolution in pixels
-	int xResolution{ 800 };
+	int yResolution{ 600 }; //Animation window resolution in pixels
+	int xResolution{ 900 };
 	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE which stat the blob colour coding refers to.
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
@@ -55,7 +55,8 @@ int main()
 		g_nameHolder = seedBlobCount + 1; //For specific blob naming, allows error tracking
 		blobArray = map.populateBlobs(seedBlob, seedBlobCount);
 		foodArray = map.populateFood(foodCount);
-		
+
+				
 		for (int day{ 0 }; day < dayCount; ++day)
 		{
 			stats.recordDay(blobArray, foodArray);
@@ -67,6 +68,7 @@ int main()
 				break;
 			}
 			walkAndEat(blobArray, foodArray, stats);
+			stats.pushBlobFrames();
 			naturalSelection(blobArray);
 			breed(blobArray);
 			digestAndSleep(blobArray);
@@ -85,6 +87,6 @@ int main()
 	{
 		blobSim.Start();
 	}
-
+	system("pause");
 	return 0;
 }

@@ -37,6 +37,17 @@ void Animation::fixCoords()
 			}
 		}
 	}
+
+	//for (int i{ 0 }; i < m_eachFoodPositions.size(); ++i)
+	//{
+	//	for (int j{ 0 }; j < m_eachFoodPositions[i].size(); ++j)
+	//	{
+	//		int x = m_eachFoodPositions[i][j].getXPosition();
+	//		int y = m_eachFoodPositions[i][j].getYPosition();
+
+	//		m_eachFoodPositions[i][j].setPosition(y, (-x +n));
+	//	}
+	//}
 }
 
 void Animation::scaleStats(double scaleRange)
@@ -87,8 +98,15 @@ void Animation::scaleStats(double scaleRange)
 
 void Animation::interpolateFrames(int numFrames)
 {
-	std::vector<std::vector<std::vector<std::array<double, 5>>>> tempDailyFrameArray;
-	std::vector< std::vector<std::array<double, 5>>> tempFrameArray;
+	if (m_cellSize / numFrames < 1)
+	{
+		numFrames = m_cellSize;
+		std::cout << "Number of interpolated frames entered is greater than number of pixels betwen grid spaces";
+		std::cout << "numFrames was set to one pixel increments, numFrames = " << numFrames<<"\n";
+	}
+
+	std::vector<std::vector<std::vector<std::array<double, 6>>>> tempDailyFrameArray;
+	std::vector< std::vector<std::array<double, 6>>> tempFrameArray;
 	
 	for (auto day : m_dailyBlobFrames)
 	{
@@ -96,8 +114,7 @@ void Animation::interpolateFrames(int numFrames)
 		for (int i{ 0 }; i<frameCount-1; ++i)
 		{
 			int blobCount{ static_cast<int>(day[i].size()) };
-			std::vector<std::array<double, 5>> iFrame;
-			iFrame = day[i];
+			std::vector<std::array<double, 6>> iFrame = day[i];
 			for (int j{ 0 }; j < blobCount; ++j)
 			{
 				std::array<double, 2> positionOne{ day[i][j][0], day[i][j][1] };
@@ -113,10 +130,10 @@ void Animation::interpolateFrames(int numFrames)
 							tempFrameArray.push_back(iFrame);
 						}						
 					}
-					else if (positionOne[1] != positionTwo[1])
+					else
 					{
 						double increment{ ((positionTwo[1] - positionOne[1]) / numFrames) };
-						for (int k{ 0 }; k < numFrames; ++k)
+						for (int k{ 0 }; k <numFrames; ++k)
 						{
 							iFrame[j][1] = positionOne[1] + (increment*k);
 							tempFrameArray.push_back(iFrame);
@@ -129,11 +146,10 @@ void Animation::interpolateFrames(int numFrames)
 		tempDailyFrameArray.push_back(tempFrameArray);
 		tempFrameArray.clear();
 	}
-	//m_dailyBlobFrames.clear();
 	m_dailyBlobFrames = tempDailyFrameArray;
 }
 
-void Animation::drawBlob(int x, int y, double s)
+void Animation::drawBlob(int x, int y, double s, double foodEaten)
 {
 	olc::Pixel lightBTR;
 	olc::Pixel midBTR;
@@ -170,6 +186,12 @@ void Animation::drawBlob(int x, int y, double s)
 
 	int i;
 	int b = m_cellSize / 8;
+
+	if (foodEaten > 0)
+	{
+		olc::Pixel tempTest(0.0, 128.0, 0.0);
+		midBTR = tempTest;
+	}
 
 	//y
 	for (i = 0; i < b; ++i)
@@ -332,6 +354,7 @@ bool Animation::OnUserCreate()
 {
 	m_eachFoodPositions = m_stats.getEachFoodArray();
 	m_dailyBlobFrames = m_stats.getDailyBlobFrames();
+
 	m_avgBlobStats = m_stats.getManySimAvg()[0];
 	m_blackBorder = 2;
 	m_homeCount = m_gridCount + 2;
@@ -348,7 +371,7 @@ bool Animation::OnUserCreate()
 		return false;
 	}
 
-	fixCoords();
+	//fixCoords();
 	scaleStats(m_scaleRange);
 	interpolateFrames(5);
 	return true;
@@ -410,16 +433,18 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	//Draw Blobs onto map
 	for (auto element : (m_dailyBlobFrames[m_day])[m_frame])
 	{
+		double foodEaten{ element[5] };
 		int index{ static_cast<int>(m_colourStat) };
 		double scaledSize{ element[index] };
-		drawBlob(((element[0] + m_blackBorder) * m_cellSize), (element[1] + m_blackBorder) * m_cellSize, scaledSize);
+		drawBlob(((element[0] + m_blackBorder) * m_cellSize), (element[1] + m_blackBorder) * m_cellSize, scaledSize, foodEaten);
 
 		//If Blob overlaps food, then remove food from foodPosition array
 		for (auto it = m_eachFoodPositions[m_day].begin(); it != m_eachFoodPositions[m_day].end();)
 		{
 			if (it->getXPosition() == element[0] && it->getYPosition() == element[1])
 			{
-				it = m_eachFoodPositions[m_day].erase(it);
+					it = m_eachFoodPositions[m_day].erase(it);
+
 			}
 			else
 			{

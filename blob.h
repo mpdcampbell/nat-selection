@@ -94,6 +94,8 @@ public:
 
 	void goHome();
 
+	void headInland();
+
 	int distToEdge();
 
 	bool hasSurplusStamina();

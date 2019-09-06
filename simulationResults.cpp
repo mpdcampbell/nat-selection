@@ -98,8 +98,10 @@ void simulationResults::recordBlobFrame(std::vector<Blob> &blobArray)
 	{
 		for (Blob blob : blobArray)
 		{
-			std::array<double, 5> posAndStats{ blob.getXPosition(), blob.getYPosition(), blob.getSize(),
-								blob.getSpeed(), blob.getSense()};
+
+			std::array<double, 6> posAndStats{ blob.getXPosition(), blob.getYPosition(), blob.getSize(),
+								blob.getSpeed(), blob.getSense(), blob.getFoodEaten()};
+			//std::cout << "blob Size: " << blob.getSize()<<"\n";
 			m_blobFrame.push_back(posAndStats);
 		}
 
@@ -110,8 +112,11 @@ void simulationResults::recordBlobFrame(std::vector<Blob> &blobArray)
 
 void simulationResults::pushBlobFrames()
 {
-	m_dailyBlobframes.push_back(m_blobFrameArray);
-	m_blobFrameArray.clear();
+	if (simCounter == 0)
+	{
+		m_dailyBlobframes.push_back(m_blobFrameArray);
+		m_blobFrameArray.clear();
+	}
 }
 
 void simulationResults::recordFoodPositions(std::vector<Food> &foodArray)
@@ -126,7 +131,6 @@ void simulationResults::recordDay(std::vector<Blob> &blobArray, std::vector<Food
 	if (simCounter == 0)
 	{
 		recordFoodPositions(foodArray);
-		pushBlobFrames();
 	}
 }
 
@@ -164,7 +168,7 @@ std::vector<std::vector<Food>>& simulationResults::getEachFoodArray()
 	return m_eachFoodArray;
 }
 
-std::vector<std::vector<std::vector<std::array<double, 5>>>>& simulationResults::getDailyBlobFrames()
+std::vector<std::vector<std::vector<std::array<double, 6>>>>& simulationResults::getDailyBlobFrames()
 {
 	return m_dailyBlobframes;
 }

@@ -18,9 +18,9 @@ protected:
 	std::vector<std::vector<std::array<double, 10>>> m_manySimAvg;
 	std::vector<std::vector<std::vector<std::vector<double>>>> m_manySimEach;
 
-	std::vector<std::array<double, 5>> m_blobFrame;
-	std::vector<std::vector<std::array<double, 5>>> m_blobFrameArray;
-	std::vector<std::vector<std::vector<std::array<double, 5>>>> m_dailyBlobframes;
+	std::vector<std::array<double, 6>> m_blobFrame;
+	std::vector<std::vector<std::array<double, 6>>> m_blobFrameArray;
+	std::vector<std::vector<std::vector<std::array<double, 6>>>> m_dailyBlobframes;
 	std::vector<std::vector<Food>> m_eachFoodArray;
 
 public:
@@ -51,7 +51,7 @@ public:
 
 	std::vector<std::vector<Food>>& getEachFoodArray();
 
-	std::vector<std::vector<std::vector<std::array<double, 5>>>>& simulationResults::getDailyBlobFrames();
+	std::vector<std::vector<std::vector<std::array<double, 6>>>>& simulationResults::getDailyBlobFrames();
 };
 
 #endif
