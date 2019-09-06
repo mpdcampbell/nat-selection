@@ -253,7 +253,8 @@ std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Foo
 	else if (!foodOpt.has_value() && !preyOpt.has_value())
 	{
 		//headInland();
-		randomStep();
+		//randomStep();
+		blindSearch();
 		//++m_xPosition;
 		return std::nullopt;
 	}
@@ -505,6 +506,26 @@ void Blob::goHome()
 				(m_xPosition += xdif / std::abs(xdif)) : 
 				(m_yPosition += ydif / std::abs(ydif));
 		}
+	}
+}
+
+void Blob::blindSearch()
+{
+	int midPoint{ m_mapSize / 2 };
+	if (m_xPosition == midPoint && m_yPosition == midPoint)
+	{
+		goHome();
+		return;
+	}
+	if (m_xPosition == 1 || m_xPosition == m_mapSize)
+	{
+		headInland();
+		return;
+	}
+	if (m_yPosition == 1 || m_yPosition == m_mapSize)
+	{
+		headInland();
+		return;
 	}
 }
 

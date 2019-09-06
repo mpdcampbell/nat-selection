@@ -96,6 +96,8 @@ public:
 
 	void headInland();
 
+	void blindSearch();
+
 	int distToEdge();
 
 	bool hasSurplusStamina();

@@ -33,9 +33,9 @@ int main()
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
 	//ENVIRONMENT VARIABLES
-	map.setMapSize(20); //Integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 40 }; //Starting number of Blobs
-	int foodCount{30}; //Number of food pieces place randomly on map daily
+	map.setMapSize(15); //Integer length, in grid spaces, of one side of the square map
+	int seedBlobCount{ 20 }; //Starting number of Blobs
+	int foodCount{25}; //Number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
 	g_mutationProb = 40; //Integer probability (%) of a blob stat mutating during replication
@@ -77,6 +77,11 @@ int main()
 		stats.recordSim();
 	}
 
+	for (int i{ 0 }; i < 15; ++i)
+	{
+		std::cout << getRandomNumber(1, 2) << "\n";
+	}
+
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day
 	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
@@ -87,6 +92,6 @@ int main()
 	{
 		blobSim.Start();
 	}
-	system("pause");
+
 	return 0;
 }
