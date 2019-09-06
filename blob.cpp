@@ -141,7 +141,7 @@ void Blob::randomStep()
 		compass.push_back(&Blob::stepEast);
 	}
 	// if the blob isn't against the West boundary
-	else if (m_xPosition > 1)
+	 if (m_xPosition > 1)
 	{
 		compass.push_back(&Blob::stepWest);
 	}
@@ -151,12 +151,12 @@ void Blob::randomStep()
 		compass.push_back(&Blob::stepNorth);
 	}
 	// if the blob isn't against the South boundary
-	else if (m_yPosition > 1)
+	 if (m_yPosition > 1)
 	{
 		compass.push_back(&Blob::stepSouth);
 	}
 	//Randomly choose direction and take one step
-	int num{ getRandomNumber(1, (compass.size())) };
+	int num{ getRandomNumber(1, (static_cast<int>(compass.size()))) };
 	(this->*compass[num - 1])();
 }
 
@@ -252,8 +252,8 @@ std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Foo
 	// if none of the above have value take random step
 	else if (!foodOpt.has_value() && !preyOpt.has_value())
 	{
-		headInland();
-		//randomStep();
+		//headInland();
+		randomStep();
 		//++m_xPosition;
 		return std::nullopt;
 	}
@@ -494,7 +494,7 @@ void Blob::goHome()
 		and thus closest to edge, and step in that direction*/
 		int xdif = m_xPosition - (m_mapSize / 2);
 		int ydif = m_yPosition - (m_mapSize / 2);
-		if (xdif == ydif) //centre line
+		if (xdif == ydif) //centre diagonal
 		{
 			(m_yPosition >= m_mapSize / 2) ?
 				(++m_yPosition) : (--m_yPosition);
@@ -510,11 +510,10 @@ void Blob::goHome()
 
 void Blob::headInland()
 {
-	/*find which coord is furthest from the midpoint
-	and thus closest to edge, and step in that direction*/
+
 	int xdif = m_xPosition - (m_mapSize / 2);
 	int ydif = m_yPosition - (m_mapSize / 2);
-	if (xdif == ydif) //centre line
+	if (xdif == ydif) //centre diagonal
 	{
 		(m_yPosition >= m_mapSize / 2) ?
 			(--m_yPosition) : (++m_yPosition);
