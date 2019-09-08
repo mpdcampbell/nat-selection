@@ -542,7 +542,7 @@ void Blob::searchPattern()
 		if (m_yPosition <= 1 + static_cast<int>(m_sense))
 		{
 			stepEastOrWest();
-		}
+		} 
 		else
 		{
 			--m_yPosition;
@@ -563,15 +563,28 @@ void Blob::searchPattern()
 
 int Blob::distToEdge()
 {
-	int xdif = m_xPosition - (m_mapSize / 2);
-	int ydif = m_yPosition - (m_mapSize / 2);
-	int edgeDistance;
+	int xSteps, ySteps;
+	int dist;
+	if (m_xPosition <= m_mapSize / 2)
+	{
+		xSteps = m_xPosition;
+	}
+	else
+	{
+		xSteps = (-m_xPosition + (m_mapSize + 1));
+	}
+	if (m_yPosition <= m_mapSize / 2)
+	{
+		ySteps = m_yPosition;
+	}
+	else
+	{
+		ySteps = (-m_yPosition + (m_mapSize + 1));
+	}
 
-	(std::abs(xdif) > std::abs(ydif)) ?
-		edgeDistance = ((m_mapSize / 2) - std::abs(xdif)) :
-		edgeDistance = ((m_mapSize / 2) - std::abs(ydif));
+	(xSteps >= ySteps) ? dist = ySteps : dist = xSteps;
 
-	return edgeDistance;
+	return dist;
 }
 
 bool Blob::hasSurplusStamina()
@@ -590,7 +603,7 @@ bool Blob::hasSurplusStamina()
 	This effective +2 means without +1 error margin blob would
 	make the wrong choice, and be unable to get home
 	*/
-	if ((m_energy / getCost()) <= dist + 3.0)
+	if ((m_energy / getCost()) <= dist + 1.0)
 	{
 		return false;
 	}
