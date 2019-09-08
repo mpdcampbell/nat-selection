@@ -33,9 +33,9 @@ int main()
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
 	//ENVIRONMENT VARIABLES
-	map.setMapSize(15); //Integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 20 }; //Starting number of Blobs
-	int foodCount{25}; //Number of food pieces place randomly on map daily
+	map.setMapSize(10); //Integer length, in grid spaces, of one side of the square map
+	int seedBlobCount{ 12 }; //Starting number of Blobs
+	int foodCount{2}; //Number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
 	g_mutationProb = 40; //Integer probability (%) of a blob stat mutating during replication
@@ -61,15 +61,16 @@ int main()
 		{
 			stats.recordDay(blobArray, foodArray);
 			std::cout << "Run #" << sim << ", Day #" << day << "\n";
-			//a check to end early incase of extinction
-			if (blobArray.size() == 0)
-			{
-				std::cout << "Extinction at end of day " << day-1 << "\n";
-				break;
-			}
+
 			walkAndEat(blobArray, foodArray, stats);
 			stats.pushBlobFrames();
 			naturalSelection(blobArray);
+			//a check to end early incase of extinction
+			if (blobArray.size() == 0)
+			{
+				std::cout << "Extinction at end of day " << day << "\n";
+				break;
+			}
 			breed(blobArray);
 			digestAndSleep(blobArray);
 			foodArray = map.populateFood(foodCount);
@@ -79,7 +80,7 @@ int main()
 
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day
-	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
+	makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
 	//ANIMATION
 	Animation blobSim(map.getMapSize(), stats, colourStat); //Creates animation object
