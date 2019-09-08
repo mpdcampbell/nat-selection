@@ -77,11 +77,6 @@ int main()
 		stats.recordSim();
 	}
 
-	for (int i{ 0 }; i < 15; ++i)
-	{
-		std::cout << getRandomNumber(1, 2) << "\n";
-	}
-
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day
 	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution

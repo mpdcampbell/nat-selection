@@ -72,6 +72,10 @@ public:
 
 	void stepWest();
 
+	void stepEastOrWest();
+
+	void stepNorthOrSouth();
+
 	void randomStep();
 
 	void stepTowards(Thing &thing);
@@ -96,7 +100,7 @@ public:
 
 	void headInland();
 
-	void blindSearch();
+	void searchPattern();
 
 	int distToEdge();
 
