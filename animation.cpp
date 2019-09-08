@@ -19,42 +19,6 @@ Animation::Animation(int cellCount, int framesPerStep, simulationResults &stats,
 	sAppName = "Natural Selection Simulation";
 }
 
-<<<<<<< Updated upstream
-void Animation::fixCoords()
-{
-	int n{ m_homeCount - 1 };
-	for (int i{ 0 }; i < m_dailyBlobFrames.size(); ++i)
-	{
-		for (int j{ 0 }; j < m_dailyBlobFrames[i].size(); ++j)
-		{
-			for (int k{ 0 }; k < (m_dailyBlobFrames[i])[j].size(); ++k)
-			{
-				double x = m_dailyBlobFrames[i][j][k][0];
-				double y = m_dailyBlobFrames[i][j][k][1];
-
-				/*Rotates each point 90 degrees clockwise about origin,
-				then shifts upwards by n. This converts my cartesian system
-				to the matrix system used in the olcPixelGameEngine library*/
-				m_dailyBlobFrames[i][j][k][0] = (y);
-				m_dailyBlobFrames[i][j][k][1] = -x + n;
-			}
-		}
-	}
-
-	for (int i{ 0 }; i < m_eachFoodPositions.size(); ++i)
-	{
-		for (int j{ 0 }; j < m_eachFoodPositions[i].size(); ++j)
-		{
-			int x = m_eachFoodPositions[i][j].getXPosition();
-			int y = m_eachFoodPositions[i][j].getYPosition();
-
-			m_eachFoodPositions[i][j].setPosition(y, (-x +n));
-		}
-	}
-}
-
-=======
->>>>>>> Stashed changes
 void Animation::scaleStats(double scaleRange)
 {
 	std::vector<double> maxSize, maxSpeed, maxSense;

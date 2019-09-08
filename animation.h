@@ -42,8 +42,6 @@ public:
 	Animation(int cellCount, int framesPerStep, simulationResults &stats, 
 			ColourStat stat );
 
-	void fixCoords();
-
 	void drawColourBar();
 
 	void scaleStats(double scaleRange);

@@ -98,8 +98,6 @@ public:
 
 	void goHome();
 
-	void headInland();
-
 	void searchPattern();
 
 	int distToEdge();
