@@ -54,7 +54,7 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simu
 						}
 					}
 					/*If food was not eaten, reduce energy and record step.
-					otherwise the huntOrRun action was to eat, no step taken
+					otherwise the huntOrRun action was to eat, no step taken,
 					so go back through the loop*/
 					else if (blobArray[i].getFoodEaten() == foodEaten)
 					{
@@ -73,7 +73,7 @@ void naturalSelection(std::vector<Blob> &blobArray)
 	"it" is the "iterator pointer": points to current element of vector.*/
 	for (auto it = blobArray.begin(); it != blobArray.end();)
 	{
-		// remember A->.function() is same as (*A).function()
+		// remember A->function() is same as (*A).function()
 		if (!it->atHome() || !it->getFoodEaten())
 		{
 			//erase blob

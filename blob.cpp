@@ -141,7 +141,7 @@ void Blob::randomStep()
 		compass.push_back(&Blob::stepEast);
 	}
 	// if the blob isn't against the West boundary
-	else if (m_xPosition > 1)
+	 if (m_xPosition > 1)
 	{
 		compass.push_back(&Blob::stepWest);
 	}
@@ -151,13 +151,42 @@ void Blob::randomStep()
 		compass.push_back(&Blob::stepNorth);
 	}
 	// if the blob isn't against the South boundary
-	else if (m_yPosition > 1)
+	 if (m_yPosition > 1)
 	{
 		compass.push_back(&Blob::stepSouth);
 	}
 	//Randomly choose direction and take one step
-	int num{ getRandomNumber(1, (compass.size())) };
+	int num{ getRandomNumber(1, (static_cast<int>(compass.size()))) };
 	(this->*compass[num - 1])();
+}
+
+void Blob::stepEastOrWest()
+{
+	std::vector<void(Blob::*)()> compass;
+
+	if (m_xPosition < m_mapSize)
+	{
+		compass.push_back(&Blob::stepEast);
+	}
+	if (m_xPosition > 1)
+	{
+		compass.push_back(&Blob::stepWest);
+	}
+	int num{ getRandomNumber(1, (static_cast<int>(compass.size()))) };
+	(this->*compass[num - 1])();
+}
+
+void Blob::stepNorthOrSouth()
+{
+	int num{ getRandomNumber(0, 1) };
+	if (num)
+	{
+		++m_yPosition;
+	}
+	else
+	{
+		--m_yPosition;
+	}
 }
 
 void Blob::stepTowards(Thing &thing)
@@ -188,29 +217,35 @@ void Blob::stepAway(Thing &thing)
 			else
 			{
 				/*If ydiff = 0 then Thing is on same row, so step North 
-				or South is equally good. Chose North arbitrarily. Otherwise
-				increase distance to pred, staying within column*/
-				(ydif == 0) ? (++m_yPosition) : 
+				or South is equally good. Otherwise increase distance to 
+				pred, staying within column*/
+				(ydif == 0) ? (stepNorthOrSouth()) :
 					(m_yPosition -= ydif / std::abs(ydif));
 			}
 		}
 		else if (m_yPosition == 0 || m_yPosition >= m_mapSize + 1)
 		{
 			/*If xdiff = 0 then Thing is on same column, so step West
-				or East is equally good. Chose East arbitrarily. Otherwise
-				increase distance to pred, staying within row*/
-			(xdif == 0) ? (++m_xPosition) :
+			or East is equally good. Otherwise increase distance to 
+			pred, staying within row*/
+			(xdif == 0) ? (stepEastOrWest()) :
 				(m_xPosition -= xdif / std::abs(xdif));
 		}
 	}
 	else
 	{
-		/*Blobs want to run from predator in general, movement not as restricted*/
-		(std::abs(xdif) > std::abs(ydif)) ?
-			(m_xPosition -= xdif / std::abs(xdif)) :
-			(m_yPosition -= ydif / std::abs(ydif));
+		if (ydif == 0 && xdif == 0)
+		{
+			randomStep();
+		}
+		else
+		{
+			/*Blobs want to run from predator in general, movement not as restricted*/
+			(std::abs(xdif) > std::abs(ydif)) ?
+				(m_xPosition -= xdif / std::abs(xdif)) :
+				(m_yPosition -= ydif / std::abs(ydif));
+		}
 	}
-
 }
 
 bool Blob::atFood(Food &food)
@@ -249,12 +284,12 @@ std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Foo
 		predDist = distToObject(blobArray[predElement]);
 	}
 	// if none of the above have value take random step
-	else if (foodDist == preyDist && preyDist == predDist)
+	else if (!foodOpt.has_value() && !preyOpt.has_value())
 	{
-		randomStep();
+		searchPattern();
 		return std::nullopt;
 	}
-
+	
 	if (foodDist == 0) //if ontop of food
 	{
 		//erase that food element
@@ -263,20 +298,14 @@ std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Foo
 		setFoodEaten(getFoodEaten() + 1);
 		return std::nullopt;
 	}
-	else if (preyDist == 0) //if ontop of prey
+	
+	if (preyDist == 0) //if ontop of prey
 	{
 		auto it = blobArray.begin();
 		//erase that blob element
 		blobArray.erase(it + preyOpt.value());
 		setFoodEaten(getFoodEaten() + 1);
 		return preyOpt.value();
-	}
-	/*if you start day sharing space with predator, i.e your
-	child is larger than you*/
-	if (predDist == 0)
-	{
-		randomStep();
-		return std::nullopt;
 	}
 
 	if (predDist < ((foodDist < preyDist) ? foodDist : preyDist))
@@ -285,7 +314,7 @@ std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Foo
 		return std::nullopt;
 	}
 
-	else if (predDist > ((foodDist < preyDist) ? foodDist : preyDist))
+	if (predDist > ((foodDist < preyDist) ? foodDist : preyDist))
 	{
 		(foodDist < preyDist) ?
 			stepTowards(foodArray[foodOpt.value()]) :
@@ -293,7 +322,7 @@ std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Foo
 		return std::nullopt;
 	}
 
-	else if (predDist == ((foodDist < preyDist) ? foodDist : preyDist))
+	if (predDist == ((foodDist < preyDist) ? foodDist : preyDist))
 	{
 		if (getFoodEaten() == 0)
 		{
@@ -329,7 +358,7 @@ std::optional<int> Blob::lookForFood(std::vector<Food> &foodArray)
 	//for every piece of food
 	int length{ static_cast<int>(foodArray.size()) };
 	for (int i = 0; i < length; ++i)
-		{
+	{
 		/*search the sense area around the blobs position to see if that food
 		is within it. With sense as a double, the rounding down of int x means
 		there is increased energetic cost (cost is a double) for every increase in sense
@@ -489,9 +518,10 @@ void Blob::goHome()
 		and thus closest to edge, and step in that direction*/
 		int xdif = m_xPosition - (m_mapSize / 2);
 		int ydif = m_yPosition - (m_mapSize / 2);
-		if (xdif == ydif) //special case if blob is at centre
+		if (xdif == ydif) //centre diagonal
 		{
-			randomStep();
+			(m_yPosition >= m_mapSize / 2) ?
+				(++m_yPosition) : (--m_yPosition);
 		}
 		else
 		{
@@ -502,24 +532,72 @@ void Blob::goHome()
 	}
 }
 
+void Blob::searchPattern()
+{
+	if (atHome())
+	{
+		randomStep();
+		return;
+	}
+	if (m_xPosition % 2 == 0)
+	{
+		if (m_yPosition <= 1 + static_cast<int>(m_sense))
+		{
+			stepEastOrWest();
+		} 
+		else
+		{
+			--m_yPosition;
+		}
+	}
+	else
+	{
+		if (m_yPosition >= m_mapSize - static_cast<int>(m_sense))
+		{
+			stepEastOrWest();
+		}
+		else
+		{
+			++m_yPosition;
+		}
+	}
+}
+
 int Blob::distToEdge()
 {
-	int xdif = m_xPosition - (m_mapSize / 2);
-	int ydif = m_yPosition - (m_mapSize / 2);
-	int edgeDistance;
-	/*find which coord is furthest from midpoint
-	Midpoint minus the modulus of (distance between coord and midpoint) 
-	will give distance between coord and edge*/
-	(std::abs(xdif) > std::abs(ydif)) ?
-		edgeDistance = ((m_mapSize / 2) - std::abs(xdif)) :
-		edgeDistance = ((m_mapSize / 2) - std::abs(ydif));
+	int xSteps, ySteps;
+	int dist;
+	if (m_xPosition <= m_mapSize / 2)
+	{
+		xSteps = m_xPosition;
+	}
+	else
+	{
+		xSteps = (-m_xPosition + (m_mapSize + 1));
+	}
+	if (m_yPosition <= m_mapSize / 2)
+	{
+		ySteps = m_yPosition;
+	}
+	else
+	{
+		ySteps = (-m_yPosition + (m_mapSize + 1));
+	}
 
-	return edgeDistance;
+	(xSteps >= ySteps) ? dist = ySteps : dist = xSteps;
+
+	return dist;
 }
 
 bool Blob::hasSurplusStamina()
 {
-	int dist{ distToEdge() };
+	if (atHome())
+	{
+		//stop blob movement after returning home with 1 food
+		return false; 
+	}
+
+	double dist{ static_cast<double>(distToEdge()) };
 	/*if remaining stamina is greater than that needed to get to
 	closest edge then blob has spare stamina. The +1 is for case
 	where blob has spare stamina then steps	one away, reducing its
@@ -527,7 +605,7 @@ bool Blob::hasSurplusStamina()
 	This effective +2 means without +1 error margin blob would
 	make the wrong choice, and be unable to get home
 	*/
-	if ((m_energy / getCost()) <= dist + 1)
+	if ((m_energy / getCost()) <= dist + 1.0)
 	{
 		return false;
 	}

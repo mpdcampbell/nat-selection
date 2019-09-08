@@ -32,7 +32,7 @@ private:
 	double m_colourBarMax;
 	simulationResults m_stats;
 	std::vector<std::vector<Food>> m_eachFoodPositions;
-	std::vector<std::vector<std::vector<std::array<double, 5>>>> m_dailyBlobFrames;
+	std::vector<std::vector<std::vector<std::array<double, 6>>>> m_dailyBlobFrames;
 	std::vector<std::array<double, 10>> m_avgBlobStats;
 
 public:
@@ -48,7 +48,7 @@ public:
 
 	void interpolateFrames(int numFrames);
 
-	void drawBlob(int x, int y, double scaledStat);
+	void drawBlob(int x, int y, double scaledStat, double foodEaten);
 
 	bool OnUserCreate() override;
 

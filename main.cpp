@@ -29,16 +29,16 @@ int main()
 	double nativeEnergy{ 1500.0 };
 	double seedSize{ 3.0 };
 	double seedSpeed{ 3.0 };
-	double seedSense{ 5.0 };
+	double seedSense{ 3.0 };
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
 	//ENVIRONMENT VARIABLES
 	map.setMapSize(10); //Integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 20 }; //Starting number of Blobs
-	int foodCount{ 40 }; //Number of food pieces place randomly on map daily
+	int seedBlobCount{ 12 }; //Starting number of Blobs
+	int foodCount{2}; //Number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
-	g_mutationProb = 20; //Integer probability (%) of a blob stat mutating during replication
+	g_mutationProb = 40; //Integer probability (%) of a blob stat mutating during replication
 	int dayCount{ 100 }; //Length of simulation in days
 	int simCount{ 1 }; //Number of repeat simulations run
 
@@ -46,8 +46,8 @@ int main()
 	int firstSim{ 0 }, lastSim{ 0 }; //Range of simulation runs to create histogram gifs for
 
 	//ANIMATION VARIABLES
-	int yResolution{ 540 }; //Animation window resolution in pixels
-	int xResolution{ 800 };
+	int yResolution{ 600 }; //Animation window resolution in pixels
+	int xResolution{ 900 };
 	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE which stat the blob colour coding refers to.
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
@@ -55,19 +55,22 @@ int main()
 		g_nameHolder = seedBlobCount + 1; //For specific blob naming, allows error tracking
 		blobArray = map.populateBlobs(seedBlob, seedBlobCount);
 		foodArray = map.populateFood(foodCount);
-		
+
+				
 		for (int day{ 0 }; day < dayCount; ++day)
 		{
 			stats.recordDay(blobArray, foodArray);
 			std::cout << "Run #" << sim << ", Day #" << day << "\n";
+
+			walkAndEat(blobArray, foodArray, stats);
+			stats.pushBlobFrames();
+			naturalSelection(blobArray);
 			//a check to end early incase of extinction
 			if (blobArray.size() == 0)
 			{
-				std::cout << "Extinction at end of day " << day-1 << "\n";
+				std::cout << "Extinction at end of day " << day << "\n";
 				break;
 			}
-			walkAndEat(blobArray, foodArray, stats);
-			naturalSelection(blobArray);
 			breed(blobArray);
 			digestAndSleep(blobArray);
 			foodArray = map.populateFood(foodCount);
@@ -77,7 +80,7 @@ int main()
 
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day
-	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
+	makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
 	//ANIMATION
 	Animation blobSim(map.getMapSize(), stats, colourStat); //Creates animation object
