@@ -48,10 +48,14 @@ int main()
 	//ANIMATION VARIABLES
 	int yResolution{ 600 }; //Animation window resolution in pixels
 	int xResolution{ 900 };
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 	int framesPerStep{ 4 }; //Controls how smooth blob moves from grid space to grid space
 >>>>>>> Stashed changes
+=======
+	int framesPerStep{ 5 }; //Controls how smooth blob moves from grid space to grid space
+>>>>>>> interpolationFrames
 	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE which stat the blob colour coding refers to.
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
@@ -59,7 +63,6 @@ int main()
 		g_nameHolder = seedBlobCount + 1; //For specific blob naming, allows error tracking
 		blobArray = map.populateBlobs(seedBlob, seedBlobCount);
 		foodArray = map.populateFood(foodCount);
-
 				
 		for (int day{ 0 }; day < dayCount; ++day)
 		{
@@ -87,7 +90,7 @@ int main()
 	makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
 	//ANIMATION
-	Animation blobSim(map.getMapSize(), stats, colourStat); //Creates animation object
+	Animation blobSim(map.getMapSize(), framesPerStep, stats, colourStat); //Creates animation object
 	if (blobSim.Construct(xResolution, yResolution, 1, 1))//Runs animation
 	{
 		blobSim.Start();

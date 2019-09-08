@@ -11,8 +11,10 @@ Animation::Animation()
 	sAppName = "Natural Selection Simulation";
 }
 
-Animation::Animation(int cellCount, simulationResults &stats, ColourStat colourStat = ColourStat::SIZE)
-	: m_gridCount{ cellCount }, m_stats{ stats }, m_colourStat{ colourStat }
+Animation::Animation(int cellCount, int framesPerStep, simulationResults &stats, 
+		ColourStat colourStat = ColourStat::SIZE)  
+		: m_gridCount{ cellCount }, m_interpFrames{ framesPerStep }, m_stats{ stats },
+		m_colourStat{ colourStat }
 {
 	sAppName = "Natural Selection Simulation";
 }
@@ -39,16 +41,16 @@ void Animation::fixCoords()
 		}
 	}
 
-	//for (int i{ 0 }; i < m_eachFoodPositions.size(); ++i)
-	//{
-	//	for (int j{ 0 }; j < m_eachFoodPositions[i].size(); ++j)
-	//	{
-	//		int x = m_eachFoodPositions[i][j].getXPosition();
-	//		int y = m_eachFoodPositions[i][j].getYPosition();
+	for (int i{ 0 }; i < m_eachFoodPositions.size(); ++i)
+	{
+		for (int j{ 0 }; j < m_eachFoodPositions[i].size(); ++j)
+		{
+			int x = m_eachFoodPositions[i][j].getXPosition();
+			int y = m_eachFoodPositions[i][j].getYPosition();
 
-	//		m_eachFoodPositions[i][j].setPosition(y, (-x +n));
-	//	}
-	//}
+			m_eachFoodPositions[i][j].setPosition(y, (-x +n));
+		}
+	}
 }
 
 =======
@@ -99,17 +101,22 @@ void Animation::scaleStats(double scaleRange)
 	}
 }
 
-void Animation::interpolateFrames(int numFrames)
+void Animation::interpolateFrames()
 {
-	if (m_cellSize / numFrames < 1)
+	if (m_cellSize < m_interpFrames)
 	{
-		numFrames = m_cellSize;
-		std::cout << "Number of interpolated frames entered is greater than the number of pixels betwen grid spaces, ";
-		std::cout << "numFrames was set to one pixel increments, numFrames = " << numFrames<<"\n";
+		m_interpFrames = m_cellSize;
+		std::cout << "Number of interpolated frames entered is greater than the ";
+		std::cout<< "number of pixels betwen grid spaces, framesPerStep was set to";
+		std::cout << " one pixel increments, framesPerStep = " << m_interpFrames << "\n";
+	}
+	else if (m_interpFrames == 0)
+	{
+		return;
 	}
 
-	std::vector<std::vector<std::vector<std::array<double, 6>>>> tempDailyFrameArray;
-	std::vector< std::vector<std::array<double, 6>>> tempFrameArray;
+	std::vector<std::vector<std::vector<std::array<double, 5>>>> tempDailyFrameArray;
+	std::vector< std::vector<std::array<double, 5>>> tempFrameArray;
 	
 	for (auto day : m_dailyBlobFrames)
 	{
@@ -117,7 +124,7 @@ void Animation::interpolateFrames(int numFrames)
 		for (int i{ 0 }; i<frameCount-1; ++i)
 		{
 			int blobCount{ static_cast<int>(day[i].size()) };
-			std::vector<std::array<double, 6>> iFrame = day[i];
+			std::vector<std::array<double, 5>> iFrame = day[i];
 			for (int j{ 0 }; j < blobCount; ++j)
 			{
 				std::array<double, 2> positionOne{ day[i][j][0], day[i][j][1] };
@@ -126,8 +133,8 @@ void Animation::interpolateFrames(int numFrames)
 				{
 					if (positionOne[0] != positionTwo[0])
 					{
-						double increment{ ((positionTwo[0] - positionOne[0]) / numFrames) };
-						for (int k{ 0 }; k<numFrames; ++k)
+						double increment{ ((positionTwo[0] - positionOne[0]) / m_interpFrames) };
+						for (int k{ 0 }; k < m_interpFrames; ++k)
 						{
 							iFrame[j][0] = positionOne[0] + (increment*k);
 							tempFrameArray.push_back(iFrame);
@@ -135,8 +142,8 @@ void Animation::interpolateFrames(int numFrames)
 					}
 					else
 					{
-						double increment{ ((positionTwo[1] - positionOne[1]) / numFrames) };
-						for (int k{ 0 }; k <numFrames; ++k)
+						double increment{ ((positionTwo[1] - positionOne[1]) / m_interpFrames) };
+						for (int k{ 0 }; k < m_interpFrames; ++k)
 						{
 							iFrame[j][1] = positionOne[1] + (increment*k);
 							tempFrameArray.push_back(iFrame);
@@ -189,12 +196,6 @@ void Animation::drawBlob(int x, int y, double s)
 
 	int i;
 	int b = m_cellSize / 8;
-
-	if (foodEaten > 0)
-	{
-		olc::Pixel tempTest(0.0, 128.0, 0.0);
-		midBTR = tempTest;
-	}
 
 	//y
 	for (i = 0; i < b; ++i)
@@ -357,7 +358,6 @@ bool Animation::OnUserCreate()
 {
 	m_eachFoodPositions = m_stats.getEachFoodArray();
 	m_dailyBlobFrames = m_stats.getDailyBlobFrames();
-
 	m_avgBlobStats = m_stats.getManySimAvg()[0];
 	m_blackBorder = 2;
 	m_homeCount = m_gridCount + 2;
@@ -373,10 +373,9 @@ bool Animation::OnUserCreate()
 		std::cout << "\nMap size too large to display, increase window resolution or decrease map size.\n\n";
 		return false;
 	}
-
-	//fixCoords();
+	
 	scaleStats(m_scaleRange);
-	interpolateFrames(5);
+	interpolateFrames();
 	return true;
 }
 
