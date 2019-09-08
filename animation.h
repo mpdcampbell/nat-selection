@@ -48,7 +48,7 @@ public:
 
 	void interpolateFrames(int numFrames);
 
-	void drawBlob(int x, int y, double scaledStat, double foodEaten);
+	void drawBlob(int x, int y, double scaledStat);
 
 	bool OnUserCreate() override;
 

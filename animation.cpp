@@ -17,6 +17,7 @@ Animation::Animation(int cellCount, simulationResults &stats, ColourStat colourS
 	sAppName = "Natural Selection Simulation";
 }
 
+<<<<<<< Updated upstream
 void Animation::fixCoords()
 {
 	int n{ m_homeCount - 1 };
@@ -50,6 +51,8 @@ void Animation::fixCoords()
 	//}
 }
 
+=======
+>>>>>>> Stashed changes
 void Animation::scaleStats(double scaleRange)
 {
 	std::vector<double> maxSize, maxSpeed, maxSense;
@@ -149,7 +152,7 @@ void Animation::interpolateFrames(int numFrames)
 	m_dailyBlobFrames = tempDailyFrameArray;
 }
 
-void Animation::drawBlob(int x, int y, double s, double foodEaten)
+void Animation::drawBlob(int x, int y, double s)
 {
 	olc::Pixel lightBTR;
 	olc::Pixel midBTR;
@@ -314,7 +317,7 @@ void Animation::drawColourBar()
 	// Draw mean value triangle
 	int avgStatIndex{ static_cast<int>(m_colourStat) - 1 }; //index of average colour stat in m_avgBlobStats
 	double avgStatVal{ (m_avgBlobStats[m_day-1][avgStatIndex]) };
-	int yMean = yZero + (1 - avgStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily mean value is
+	double yMean = yZero + (1 - avgStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily mean value is
 	FillTriangle(x + (2.25* m_cellSize), yMean, x + (3.25*m_cellSize), yMean - (0.5*m_cellSize), x + (3.25*m_cellSize), yMean + (0.5*m_cellSize), olc::WHITE);
 	DrawString(x + (3.50 * m_cellSize), yMean - (0.75*m_cellSize), "Mean", olc::WHITE, textScale);
 	std::string avgValStr{ std::to_string(avgStatVal) };
@@ -433,10 +436,9 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	//Draw Blobs onto map
 	for (auto element : (m_dailyBlobFrames[m_day])[m_frame])
 	{
-		double foodEaten{ element[5] };
 		int index{ static_cast<int>(m_colourStat) };
 		double scaledSize{ element[index] };
-		drawBlob(((element[0] + m_blackBorder) * m_cellSize), (element[1] + m_blackBorder) * m_cellSize, scaledSize, foodEaten);
+		drawBlob(((element[0] + m_blackBorder) * m_cellSize), (element[1] + m_blackBorder) * m_cellSize, scaledSize);
 
 		//If Blob overlaps food, then remove food from foodPosition array
 		for (auto it = m_eachFoodPositions[m_day].begin(); it != m_eachFoodPositions[m_day].end();)

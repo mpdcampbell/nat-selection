@@ -565,27 +565,12 @@ void Blob::searchPattern()
 
 int Blob::distToEdge()
 {
+	double mid( (m_mapSize + 1.0) / 2.0 );
 	int xSteps, ySteps;
 	int dist;
-	if (m_xPosition <= m_mapSize / 2)
-	{
-		xSteps = m_xPosition;
-	}
-	else
-	{
-		xSteps = (-m_xPosition + (m_mapSize + 1));
-	}
-	if (m_yPosition <= m_mapSize / 2)
-	{
-		ySteps = m_yPosition;
-	}
-	else
-	{
-		ySteps = (-m_yPosition + (m_mapSize + 1));
-	}
-
+	xSteps = mid - std::abs(m_xPosition - mid);
+	ySteps = mid - std::abs(m_yPosition - mid);
 	(xSteps >= ySteps) ? dist = ySteps : dist = xSteps;
-
 	return dist;
 }
 
