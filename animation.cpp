@@ -101,7 +101,7 @@ void Animation::interpolateFrames(int numFrames)
 	if (m_cellSize / numFrames < 1)
 	{
 		numFrames = m_cellSize;
-		std::cout << "Number of interpolated frames entered is greater than number of pixels betwen grid spaces";
+		std::cout << "Number of interpolated frames entered is greater than the number of pixels betwen grid spaces, ";
 		std::cout << "numFrames was set to one pixel increments, numFrames = " << numFrames<<"\n";
 	}
 

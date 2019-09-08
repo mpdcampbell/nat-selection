@@ -162,15 +162,18 @@ void Blob::randomStep()
 
 void Blob::stepEastOrWest()
 {
-	int num{ getRandomNumber(0, 1) };
-	if (num)
+	std::vector<void(Blob::*)()> compass;
+
+	if (m_xPosition < m_mapSize)
 	{
-		++m_xPosition;
+		compass.push_back(&Blob::stepEast);
 	}
-	else
+	if (m_xPosition > 1)
 	{
-		--m_xPosition;
+		compass.push_back(&Blob::stepWest);
 	}
+	int num{ getRandomNumber(1, (static_cast<int>(compass.size()))) };
+	(this->*compass[num - 1])();
 }
 
 void Blob::stepNorthOrSouth()
@@ -185,7 +188,6 @@ void Blob::stepNorthOrSouth()
 		--m_yPosition;
 	}
 }
-
 
 void Blob::stepTowards(Thing &thing)
 {
