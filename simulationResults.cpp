@@ -98,6 +98,7 @@ void simulationResults::recordBlobFrame(std::vector<Blob> &blobArray)
 	{
 		for (Blob blob : blobArray)
 		{
+
 			std::array<double, 5> posAndStats{ blob.getXPosition(), blob.getYPosition(), blob.getSize(),
 								blob.getSpeed(), blob.getSense()};
 			m_blobFrame.push_back(posAndStats);
@@ -110,8 +111,11 @@ void simulationResults::recordBlobFrame(std::vector<Blob> &blobArray)
 
 void simulationResults::pushBlobFrames()
 {
-	m_dailyBlobframes.push_back(m_blobFrameArray);
-	m_blobFrameArray.clear();
+	if (simCounter == 0)
+	{
+		m_dailyBlobframes.push_back(m_blobFrameArray);
+		m_blobFrameArray.clear();
+	}
 }
 
 void simulationResults::recordFoodPositions(std::vector<Food> &foodArray)
@@ -126,7 +130,6 @@ void simulationResults::recordDay(std::vector<Blob> &blobArray, std::vector<Food
 	if (simCounter == 0)
 	{
 		recordFoodPositions(foodArray);
-		pushBlobFrames();
 	}
 }
 
@@ -137,7 +140,6 @@ void simulationResults::recordSim()
 	m_manySimEach.push_back(m_eachBlobStats);
 	m_avgBlobStats.clear();
 	m_eachBlobStats.clear();
-
 }
 
 std::vector<std::array<double, 10>>& simulationResults::getAvgBlobStats()

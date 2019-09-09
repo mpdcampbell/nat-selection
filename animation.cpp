@@ -11,32 +11,12 @@ Animation::Animation()
 	sAppName = "Natural Selection Simulation";
 }
 
-Animation::Animation(int cellCount, simulationResults &stats, ColourStat colourStat = ColourStat::SIZE)
-	: m_gridCount{ cellCount }, m_stats{ stats }, m_colourStat{ colourStat }
+Animation::Animation(int cellCount, int framesPerStep, simulationResults &stats, 
+		ColourStat colourStat = ColourStat::SIZE)  
+		: m_gridCount{ cellCount }, m_interpFrames{ framesPerStep }, m_stats{ stats },
+		m_colourStat{ colourStat }
 {
 	sAppName = "Natural Selection Simulation";
-}
-
-void Animation::fixCoords()
-{
-	int n{ m_homeCount - 1 };
-	for (int i{ 0 }; i < m_dailyBlobFrames.size(); ++i)
-	{
-		for (int j{ 0 }; j < m_dailyBlobFrames[i].size(); ++j)
-		{
-			for (int k{ 0 }; k < (m_dailyBlobFrames[i])[j].size(); ++k)
-			{
-				double x = m_dailyBlobFrames[i][j][k][0];
-				double y = m_dailyBlobFrames[i][j][k][1];
-
-				/*Rotates each point 90 degrees clockwise about origin,
-				then shifts upwards by n. This converts my cartesian system
-				to the matrix system used in the olcPixelGameEngine library*/
-				m_dailyBlobFrames[i][j][k][0] = (y);
-				m_dailyBlobFrames[i][j][k][1] = -x + n;
-			}
-		}
-	}
 }
 
 void Animation::scaleStats(double scaleRange)
@@ -83,6 +63,64 @@ void Animation::scaleStats(double scaleRange)
 			}
 		}
 	}
+}
+
+void Animation::interpolateFrames()
+{
+	if (m_cellSize < m_interpFrames)
+	{
+		m_interpFrames = m_cellSize;
+		std::cout << "Number of interpolated frames entered is greater than the ";
+		std::cout<< "number of pixels betwen grid spaces, framesPerStep was set to";
+		std::cout << " one pixel increments, framesPerStep = " << m_interpFrames << "\n";
+	}
+	else if (m_interpFrames == 0)
+	{
+		return;
+	}
+
+	std::vector<std::vector<std::vector<std::array<double, 5>>>> tempDailyFrameArray;
+	std::vector< std::vector<std::array<double, 5>>> tempFrameArray;
+	
+	for (auto day : m_dailyBlobFrames)
+	{
+		int frameCount{ static_cast<int>(day.size())};
+		for (int i{ 0 }; i<frameCount-1; ++i)
+		{
+			int blobCount{ static_cast<int>(day[i].size()) };
+			std::vector<std::array<double, 5>> iFrame = day[i];
+			for (int j{ 0 }; j < blobCount; ++j)
+			{
+				std::array<double, 2> positionOne{ day[i][j][0], day[i][j][1] };
+				std::array<double, 2> positionTwo{ day[i+1][j][0], day[i+1][j][1] };				
+				if (positionOne != positionTwo)
+				{
+					if (positionOne[0] != positionTwo[0])
+					{
+						double increment{ ((positionTwo[0] - positionOne[0]) / m_interpFrames) };
+						for (int k{ 0 }; k < m_interpFrames; ++k)
+						{
+							iFrame[j][0] = positionOne[0] + (increment*k);
+							tempFrameArray.push_back(iFrame);
+						}						
+					}
+					else
+					{
+						double increment{ ((positionTwo[1] - positionOne[1]) / m_interpFrames) };
+						for (int k{ 0 }; k < m_interpFrames; ++k)
+						{
+							iFrame[j][1] = positionOne[1] + (increment*k);
+							tempFrameArray.push_back(iFrame);
+						}
+					}
+					j = blobCount;
+				}
+			}
+		}
+		tempDailyFrameArray.push_back(tempFrameArray);
+		tempFrameArray.clear();
+	}
+	m_dailyBlobFrames = tempDailyFrameArray;
 }
 
 void Animation::drawBlob(int x, int y, double s)
@@ -244,7 +282,7 @@ void Animation::drawColourBar()
 	// Draw mean value triangle
 	int avgStatIndex{ static_cast<int>(m_colourStat) - 1 }; //index of average colour stat in m_avgBlobStats
 	double avgStatVal{ (m_avgBlobStats[m_day-1][avgStatIndex]) };
-	int yMean = yZero + (1 - avgStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily mean value is
+	double yMean = yZero + (1 - avgStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily mean value is
 	FillTriangle(x + (2.25* m_cellSize), yMean, x + (3.25*m_cellSize), yMean - (0.5*m_cellSize), x + (3.25*m_cellSize), yMean + (0.5*m_cellSize), olc::WHITE);
 	DrawString(x + (3.50 * m_cellSize), yMean - (0.75*m_cellSize), "Mean", olc::WHITE, textScale);
 	std::string avgValStr{ std::to_string(avgStatVal) };
@@ -299,9 +337,9 @@ bool Animation::OnUserCreate()
 		std::cout << "\nMap size too large to display, increase window resolution or decrease map size.\n\n";
 		return false;
 	}
-
-	fixCoords();
+	
 	scaleStats(m_scaleRange);
+	interpolateFrames();
 	return true;
 }
 
@@ -370,7 +408,8 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 		{
 			if (it->getXPosition() == element[0] && it->getYPosition() == element[1])
 			{
-				it = m_eachFoodPositions[m_day].erase(it);
+					it = m_eachFoodPositions[m_day].erase(it);
+
 			}
 			else
 			{

@@ -72,6 +72,10 @@ public:
 
 	void stepWest();
 
+	void stepEastOrWest();
+
+	void stepNorthOrSouth();
+
 	void randomStep();
 
 	void stepTowards(Thing &thing);
@@ -93,6 +97,8 @@ public:
 	bool atHome();
 
 	void goHome();
+
+	void searchPattern();
 
 	int distToEdge();
 

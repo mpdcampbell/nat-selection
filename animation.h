@@ -26,10 +26,11 @@ private:
 	int m_cellSize;
 	int m_day;
 	int m_frame;
+	int m_interpFrames;
 	double m_scaleRange;
+	double m_colourBarMax;
 	bool m_paused;
 	ColourStat m_colourStat;
-	double m_colourBarMax;
 	simulationResults m_stats;
 	std::vector<std::vector<Food>> m_eachFoodPositions;
 	std::vector<std::vector<std::vector<std::array<double, 5>>>> m_dailyBlobFrames;
@@ -38,13 +39,14 @@ private:
 public:
 	Animation();
 
-	Animation(int cellCount, simulationResults &stats, ColourStat stat );
-
-	void fixCoords();
+	Animation(int cellCount, int framesPerStep, simulationResults &stats, 
+			ColourStat stat );
 
 	void drawColourBar();
 
 	void scaleStats(double scaleRange);
+
+	void interpolateFrames();
 
 	void drawBlob(int x, int y, double scaledStat);
 
