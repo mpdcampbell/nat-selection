@@ -235,7 +235,8 @@ void makeHistogram(simulationResults &stats, int firstSim, int lastSim)
 		gp << "hist = 'u (binwidth*(floor(($1-binstart)/binwidth)+0.5)+binstart):(1.0) smooth freq w boxes'\n";
 
 		//Set output as gif
-		int delay = 5000 / static_cast<int>(manySimEach[sim].size());
+		//int delay = 5000 / static_cast<int>(manySimEach[sim].size());
+		int delay = 30;
 		gp << "set terminal gif animate delay " << delay << " crop size 1280,600 enhanced font 'Verdana, 10'\n";
 		gp << "set output 'StatDistribution_Sim" << sim << ".gif'\n";
 		gp << "set xlabel font 'Verdana,12'\n";
