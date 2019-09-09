@@ -26,7 +26,7 @@ int main()
 	simulationResults stats;
 
 	//INITIAL BLOB STATS
-	double nativeEnergy{ 800.0 };
+	double nativeEnergy{ 600.0 };
 	double seedSize{ 2.0 };
 	double seedSpeed{ 2.0 };
 	double seedSense{ 1.0 };
@@ -48,7 +48,7 @@ int main()
 	//ANIMATION VARIABLES
 	int yResolution{ 650 }; //Animation window resolution in pixels
 	int xResolution{ 1000 };
-	int framesPerStep{ 4 }; //Controls how smooth blob moves from grid space to grid space
+	int framesPerStep{ 5 }; //Controls how smooth blob moves from grid space to grid space
 	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE which stat the blob colour coding refers to.
 
 	for (int sim{ 0 }; sim < simCount; ++sim)

@@ -452,7 +452,7 @@ std::optional<int> Blob::lookForPredator(std::vector<Blob> &blobArray)
 	int length{ static_cast<int>(blobArray.size()) };
 	for (int i = 0; i < length; ++i)
 	{
-		if ((0.8*blobArray[i].getSize()) >= m_size)
+		if ((0.8*blobArray[i].getSize()) >= m_size && !blobArray[i].atHome())
 		{
 			/*search the sense area around the blobs position to see if that food
 			is within it. With sense as a double, the rounding down of int x means
