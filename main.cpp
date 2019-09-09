@@ -26,16 +26,16 @@ int main()
 	simulationResults stats;
 
 	//INITIAL BLOB STATS
-	double nativeEnergy{ 1500.0 };
-	double seedSize{ 3.0 };
-	double seedSpeed{ 3.0 };
-	double seedSense{ 3.0 };
+	double nativeEnergy{ 800.0 };
+	double seedSize{ 2.0 };
+	double seedSpeed{ 2.0 };
+	double seedSense{ 1.0 };
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
 	//ENVIRONMENT VARIABLES
-	map.setMapSize(15); //Integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 20 }; //Starting number of Blobs
-	int foodCount{30}; //Number of food pieces place randomly on map daily
+	map.setMapSize(8); //Integer length, in grid spaces, of one side of the square map
+	int seedBlobCount{ 4 }; //Starting number of Blobs
+	int foodCount{10}; //Number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
 	g_mutationProb = 30; //Integer probability (%) of a blob stat mutating during replication
@@ -46,8 +46,8 @@ int main()
 	int firstSim{ 0 }, lastSim{ 0 }; //Range of simulation runs to create histogram gifs for
 
 	//ANIMATION VARIABLES
-	int yResolution{ 600 }; //Animation window resolution in pixels
-	int xResolution{ 900 };
+	int yResolution{ 650 }; //Animation window resolution in pixels
+	int xResolution{ 1000 };
 	int framesPerStep{ 4 }; //Controls how smooth blob moves from grid space to grid space
 	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE which stat the blob colour coding refers to.
 
