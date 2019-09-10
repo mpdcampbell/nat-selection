@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <array>
+#include <stdio.h>
 #include "blob.h"
 #include "food.h"
 #include "simulationResults.h"
@@ -35,6 +36,11 @@ private:
 	std::vector<std::vector<Food>> m_eachFoodPositions;
 	std::vector<std::vector<std::vector<std::array<double, 5>>>> m_dailyBlobFrames;
 	std::vector<std::array<double, 10>> m_avgBlobStats;
+
+	FILE* m_ffmpeg;
+	int* m_buffer;
+	int m_width;
+	int m_height;
 
 public:
 	Animation();

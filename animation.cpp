@@ -1,5 +1,6 @@
 #include <vector>
 #include <array>
+#include <stdio.h>
 #include <math.h>
 #include "blob.h"
 #include "food.h"
@@ -340,6 +341,14 @@ bool Animation::OnUserCreate()
 	
 	scaleStats(m_scaleRange);
 	interpolateFrames();
+
+	const char* cmd = "ffmpeg -r 60 -f rawvideo -pix_fmt rgba -s 900x600 -i - "
+		"-threads 0 -preset fast -y -pix_fmt yuv420p -crf 21 -vf vflip toutput.mp4";
+	m_ffmpeg = _popen(cmd, "wb");
+	m_width = static_cast<int>(ScreenWidth());
+	m_height = static_cast<int>(ScreenHeight());
+	m_buffer = new int[m_width*m_height];
+	
 	return true;
 }
 
@@ -417,6 +426,11 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 			}
 		}
 	}
+
+	//Read the displayed pixels and copy into m_buffer
+	glReadPixels(0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, m_buffer);
+	//send m_buffer to ffmpeg via the pipe "m_ffmpeg"
+	fwrite(m_buffer, sizeof(int)*m_width*m_height, 1, m_ffmpeg);
 	
 	++m_frame;
 
@@ -431,13 +445,15 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	//When finished all days, end animation
 	if (m_day == m_dailyBlobFrames.size())
 	{
+		_pclose(m_ffmpeg);
 		return false;
 	}
 
 	/*Can be used as a delay between each step if your computer is too fast
 	and the animation runs too quickly*/
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	//int num = fElapsedTime;
+	//std::this_thread::sleep_for(std::chrono::seconds(num));
 
 	return true;
 }
