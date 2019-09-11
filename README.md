@@ -1,5 +1,5 @@
 # nat-selection
-This is a recreation of the natural selection simulation demonstrated in a [youtube video](https://www.youtube.com/watch?v=0ZGbIKd0XrM), where creatures compete and thier traits evolve depending on environment pressure. Primer has his own [github repository](https://github.com/Helpsypoo/primer), but none of his code was used here. The idea was to copy the simulation "rules" set out in the video and independently recreate it in C++. The simulation runs in its entirety offscreen, then [gnuplot](http://www.gnuplot.info/) is used, via the [gnuplot-iostream api](https://github.com/dstahlke/gnuplot-iostream), to produce plots of how the population number and the creature traits changed. Additionally, a 2D animation of the simulation is displayed, using the [olcPixelGameEngine library](https://github.com/OneLoneCoder/olcPixelGameEngine), as each generated frame is passed to [ffmpeg](https://ffmpeg.org/) to create a local video. 
+This is a recreation of the natural selection simulation demonstrated in a [youtube video](https://www.youtube.com/watch?v=0ZGbIKd0XrM), where creatures compete and their traits evolve depending on environment pressure. Primer has his own [github repository](https://github.com/Helpsypoo/primer), but none of his code was used here. The idea was to copy the simulation "rules" set out in the video and independently recreate it in C++. The simulation runs in its entirety offscreen, then [gnuplot](http://www.gnuplot.info/) is used, via the [gnuplot-iostream api](https://github.com/dstahlke/gnuplot-iostream), to produce plots of how the population number and the creature traits changed. Additionally, a 2D animation of the simulation is displayed, using the [olcPixelGameEngine library](https://github.com/OneLoneCoder/olcPixelGameEngine), as each generated frame is passed to [ffmpeg](https://ffmpeg.org/) to create a local video. 
 
 #### **Example Graphs**
 
@@ -27,7 +27,7 @@ The simulation creates a squared grid map, with "blob" creatures living at the e
  - Speed - The number of grid spaces or "steps" it can take at once.
  - Sense - The radius of grid spaces around it that a blob can see. 
  
-However, each of these traits has an energy cost. A blob starts each day with an equal amount of energy and each step taken has an energy cost, where *cost = size<sup>3</sup>speed<sup>2</sup>+sense*. When a blob reproduces, there is mutation chance that one or more of the childs' traits will be increased or decreased in value relative to the parent. As the population grows and competition increases, blobs with less preferable traits die out, and the population evolves towards optimal traits for that environment.
+However, each of these traits has an energy cost. A blob starts each day with an equal amount of energy and each step taken has an energy cost, where *cost = size<sup>3</sup>speed<sup>2</sup>+sense*. When a blob reproduces, there is mutation chance that one or more of the child's traits will be increased or decreased in value relative to the parent. As the population grows and competition increases, blobs with less preferable traits die out, and the population evolves towards optimal traits for that environment.
 
  ## External Requirements To Run
   - Install gnuplot *(last tested with version 5.2.7)*
@@ -48,7 +48,7 @@ The gnuplot-iosteam api is dependent on the boost libraries. The boost header (.
 - To add the library files, in the toolbar open *Project -> Properties -> Linker -> General -> Additional Library Directories*
 -  Click the dropdown arrow then *<Edit...>* and add the path to the *lib* and *lib64-msvc-14.1* folders, e.g. *C:\boost_1_70_0\lib* and *C:\boost_1_70_0\lib64-msvc-14.1* 
 
-**Note:** I kept encountering linker errors with the \lib files when trying x86 builds within Visual Studio. Not sure wether this is a boost library problem, a problem with gnuplot-iostream on windows, or my own mistake. But rather than fix it, I just removed the lib path (kept the lib64 path) and always compiled x64 builds.
+**Note:** I kept encountering linker errors with the \lib files when trying x86 builds within Visual Studio. Not sure whether this is a boost library problem, a problem with gnuplot-iostream on windows, or my own mistake. But rather than fix it, I just removed the lib path (kept the lib64 path) and always compiled x64 builds.
 
 ## Art
 The pixel art for the blob creatures and food were both adapted from free resources on itch.io, found [here](https://stealthix.itch.io/animated-slimes) and [here](https://vectorpixelstar.itch.io/8x8px-icons) respectively.
