@@ -33,23 +33,24 @@ int main()
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
 	//ENVIRONMENT VARIABLES
-	map.setMapSize(8); //Integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 4 }; //Starting number of Blobs
-	int foodCount{10}; //Number of food pieces place randomly on map daily
+	map.setMapSize(10); //Integer length, in grid spaces, of one side of the square map
+	int seedBlobCount{ 10 }; //Starting number of Blobs
+	int foodCount{20}; //Number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
 	g_mutationProb = 30; //Integer probability (%) of a blob stat mutating during replication
-	int dayCount{ 100 }; //Length of simulation in days
+	int dayCount{ 2 }; //Length of simulation in days
 	int simCount{ 1 }; //Number of repeat simulations run
 
 	//GRAPH VARIABLES
 	int firstSim{ 0 }, lastSim{ 0 }; //Range of simulation runs to create histogram gifs for
 
 	//ANIMATION VARIABLES
-	int yResolution{ 650 }; //Animation window resolution in pixels
-	int xResolution{ 1000 };
-	int framesPerStep{ 4 }; //Controls how smooth blob moves from grid space to grid space
-	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE which stat the blob colour coding refers to.
+	int yResolution{ 600 }; //Animation window resolution in pixels
+	int xResolution{ 900 };
+	int framesPerStep{ 5 }; //Controls how smooth blob moves from grid space to grid space
+	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE the stat blob colour refers to.
+	std::string vidName{}; //Video filename, if blank default of xM_xB_xF_xD_Stat is used
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
 	{
@@ -83,11 +84,11 @@ int main()
 	makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
 	//ANIMATION
-	Animation blobSim(map.getMapSize(), framesPerStep, stats, colourStat); //Creates animation object
+	Animation blobSim(map.getMapSize(), framesPerStep, stats, vidName, colourStat); //Creates animation object
 	if (blobSim.Construct(xResolution, yResolution, 1, 1))//Runs animation
 	{
 		blobSim.Start();
 	}
-
+	system("pause");
 	return 0;
 }

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <array>
+#include <stdio.h>
 #include "blob.h"
 #include "food.h"
 #include "simulationResults.h"
@@ -36,18 +37,30 @@ private:
 	std::vector<std::vector<std::vector<std::array<double, 5>>>> m_dailyBlobFrames;
 	std::vector<std::array<double, 10>> m_avgBlobStats;
 
+	FILE* m_ffmpeg;
+	int* m_buffer;
+	int m_xRes;
+	int m_yRes;
+	std::string m_vidName;
+
 public:
 	Animation();
 
 	Animation(int cellCount, int framesPerStep, simulationResults &stats, 
-			ColourStat stat );
+			std::string vidName, ColourStat stat );
 
-	void drawColourBar();
+	bool colourStatValid();
+
+	std::string getColourStatStr();
+
+	std::string getDefaultFilename();
 
 	void scaleStats(double scaleRange);
 
 	void interpolateFrames();
 
+	void drawColourBar();
+	   
 	void drawBlob(int x, int y, double scaledStat);
 
 	bool OnUserCreate() override;

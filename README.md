@@ -1,5 +1,5 @@
 # nat-selection
-This is a recreation of the natural selection simulation demonstrated in a [youtube video](https://www.youtube.com/watch?v=0ZGbIKd0XrM). Primer has his own [github repository](https://github.com/Helpsypoo/primer), but none of his code was used here. The idea was to copy the simulation "rules" set out in the video and independently recreate it in C++. The code produces a 2D animation of the simulation, using the [olcPixelGameEngine library](https://github.com/OneLoneCoder/olcPixelGameEngine), where blob colour represents the value of a chosen trait. Additionally, [gnuplot](http://www.gnuplot.info/) is used, via the [gnuplot-iostream api](https://github.com/dstahlke/gnuplot-iostream), to produce plots of how the population number and creature traits change across simulation.
+This is a recreation of the natural selection simulation demonstrated in a [youtube video](https://www.youtube.com/watch?v=0ZGbIKd0XrM), where creatures compete and thier traits evolve depending on environment pressure. Primer has his own [github repository](https://github.com/Helpsypoo/primer), but none of his code was used here. The idea was to copy the simulation "rules" set out in the video and independently recreate it in C++. The simulation runs in its entirety offscreen, then [gnuplot](http://www.gnuplot.info/) is used, via the [gnuplot-iostream api](https://github.com/dstahlke/gnuplot-iostream), to produce plots of how the population number and the creature traits changed. Additionally, a 2D animation of the simulation is displayed, using the [olcPixelGameEngine library](https://github.com/OneLoneCoder/olcPixelGameEngine), as each generated frame is passed to [ffmpeg](https://ffmpeg.org/) to create a local video. 
 
 #### **Example Graphs**
 
@@ -29,20 +29,16 @@ The simulation creates a squared grid map, with "blob" creatures living at the e
  
 However, each of these traits has an energy cost. A blob starts each day with an equal amount of energy and each step taken has an energy cost, where *cost = size<sup>3</sup>speed<sup>2</sup>+sense*. When a blob reproduces, there is mutation chance that one or more of the childs' traits will be increased or decreased in value relative to the parent. As the population grows and competition increases, blobs with less preferable traits die out, and the population evolves towards optimal traits for that environment.
 
- ## External requirements
+ ## External Requirements To Run
   - Install gnuplot *(last tested with version 5.2.7)*
-  - Include gnuplot-iostream.h *(tested with last file commit on 11/04/19)*
-  - Include olcPixelGameEngine.h *(tested with last file commit on 18/04/19)*
+  - Install ffmpeg *(last tested with windows build 4.2)*
   - The boost C++ libraries *(tested with version 1.70.0)*
 
   #### gnuplot installation
 The latest version of gnuplot can be found [here](http://www.gnuplot.info/download.html), last tested version [here](https://sourceforge.net/projects/gnuplot/files/gnuplot/5.2.7/). Gnuplot just needs to be installed on the system such that "gnuplot" is a recognised command in cmd/terminal. In windows (my system) I used the "*gp527-win64-mingw.exe*" installer, ensuring to check the "*Add application directory to your PATH environment variable*" option. Otherwise gnuplot cannot be called from cmd.
 
-  #### gnuplot-iostream.h 
-The code utilises the gnuplot-iostream api, which is contained entirely within one [large header file](https://github.com/dstahlke/gnuplot-iostream/blob/master/gnuplot-iostream.h). Download the header file and place it in the same folder as the other header files, that's it. If you want to place the header file elsewhere, for example a folder called headers where you keep headers useful for future use, ensure to add the folder path to the include path in your IDE. 
-
-  #### olcPixelGameEngine.h
-The animation is generated with the olcPixelGameEngine library, which is also contained entirely within one [large header file](https://github.com/OneLoneCoder/olcPixelGameEngine/blob/master/olcPixelGameEngine.h). Download the header file and place it in the same folder as the other header files, that's it. If you want to place the header file elsewhere, for example a folder called headers where you keep headers useful for future use, ensure to add the folder path to the include path in your IDE.
+  #### ffmpeg installation
+The latest version of ffmpeg can be found [here](https://ffmpeg.org/download.html).
 
   #### boost libraries
 The gnuplot-iosteam api is dependent on the boost libraries. The boost header (.h) files must be visible to the compiler, and the library (.lib and .dll) files visible to the linker. If they are not made available to the IDE the code will not compile. The following instructions are for Visual Studio (the IDE I used).
