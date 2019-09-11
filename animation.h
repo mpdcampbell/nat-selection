@@ -39,21 +39,28 @@ private:
 
 	FILE* m_ffmpeg;
 	int* m_buffer;
-	int m_width;
-	int m_height;
+	int m_xRes;
+	int m_yRes;
+	std::string m_vidName;
 
 public:
 	Animation();
 
 	Animation(int cellCount, int framesPerStep, simulationResults &stats, 
-			ColourStat stat );
+			std::string vidName, ColourStat stat );
 
-	void drawColourBar();
+	bool colourStatValid();
+
+	std::string getColourStatStr();
+
+	std::string getDefaultFilename();
 
 	void scaleStats(double scaleRange);
 
 	void interpolateFrames();
 
+	void drawColourBar();
+	   
 	void drawBlob(int x, int y, double scaledStat);
 
 	bool OnUserCreate() override;
