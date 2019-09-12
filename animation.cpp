@@ -218,7 +218,7 @@ void Animation::drawColourBar()
 
 	// Draw mean value triangle
 	int avgStatIndex{ static_cast<int>(m_colourStat) - 1 }; //index of average colour stat in m_avgBlobStats
-	double avgStatVal{ (m_avgBlobStats[m_day - 1][avgStatIndex]) };
+	double avgStatVal{ (m_avgBlobStats[m_day][avgStatIndex]) };
 	double yMean = yZero + (1 - avgStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily mean value is
 	FillTriangle(x + (2.25* m_cellSize), yMean, x + (3.25*m_cellSize), yMean - (0.5*m_cellSize), x + (3.25*m_cellSize), yMean + (0.5*m_cellSize), olc::WHITE);
 	DrawString(x + (3.50 * m_cellSize), yMean - (0.75*m_cellSize), "Mean", olc::WHITE, textScale);
@@ -228,7 +228,7 @@ void Animation::drawColourBar()
 
 	// Draw max value triangle
 	int maxStatIndex{ static_cast<int>(m_colourStat) + 2 }; //index of max colour stat in m_avgBlobStats
-	double maxStatVal{ (m_avgBlobStats[m_day - 1][maxStatIndex]) };
+	double maxStatVal{ (m_avgBlobStats[m_day][maxStatIndex]) };
 	int yMax = yZero + (1 - maxStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily max value is
 	//if the max val triangle doesn't overlap mean triangle, draw
 	if (std::abs(yMean - yMax) >= m_cellSize)
@@ -242,7 +242,7 @@ void Animation::drawColourBar()
 
 	// Draw min value triangle
 	int minStatIndex{ static_cast<int>(m_colourStat) + 5 }; //index of min colour stat in m_avgBlobStats
-	double minStatVal{ (m_avgBlobStats[m_day - 1][minStatIndex]) };
+	double minStatVal{ (m_avgBlobStats[m_day][minStatIndex]) };
 	int yMin = yZero + (1 - minStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily min value is
 	//if the min val triangle doesn't overlap mean triangle, draw
 	if (std::abs(yMean - yMin) >= m_cellSize)
@@ -364,7 +364,7 @@ bool Animation::OnUserCreate()
 	m_homeCount = m_gridCount + 2;
 	m_screenCount = m_homeCount + (m_blackBorder * 2);
 	m_cellSize = ScreenHeight() / m_screenCount;
-	m_day = 1;
+	m_day = 0;
 	m_frame = 0;
 	m_scaleRange = 100.0;
 	m_xRes = static_cast<int>(ScreenWidth());
@@ -488,20 +488,28 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	reset the frame counter to zero*/
 	if (m_frame == static_cast<int>(m_dailyBlobFrames[m_day].size()))
 	{
-		++m_day;
-		m_frame = 0;
+		//When finished all days, end animation
+		if (m_day == m_dailyBlobFrames.size()-1)
+		{
+			_pclose(m_ffmpeg);
+			delete m_buffer;
+			return false;
+		}
+		else
+		{
+			++m_day;
+			m_frame = 0;
+		}
 	}
 
-	//When finished all days, end animation
-	if (m_day == m_dailyBlobFrames.size())
-	{
-		_pclose(m_ffmpeg);
-		delete m_buffer;
-		return false;
-	}
+	
 
 	// Artificially limiting fps max to 60 to stay below ffmpeg input rate
-	std::this_thread::sleep_for(std::chrono::milliseconds(16));
-
+	
+	//if (fElapsedTime < (1/60))
+	//{
+	//	std::this_thread::sleep_for(std::chrono::milliseconds(16));
+	//}
+	
 	return true;
 }
