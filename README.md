@@ -31,7 +31,7 @@ However, each of these traits has an energy cost. A blob starts each day with an
 
  ## External Requirements To Run
   - Install gnuplot *(last tested with version 5.2.7)*
-  - Install ffmpeg *(last tested with windows build 4.2)*
+  - Install ffmpeg *(last tested with version 4.2)*
   - The boost C++ libraries *(tested with version 1.70.0)*
 
   #### gnuplot installation
