@@ -34,7 +34,7 @@ private:
 	ColourStat m_colourStat;
 	simulationResults m_stats;
 	std::vector<std::vector<Food>> m_eachFoodPositions;
-	std::vector<std::vector<std::vector<std::array<double, 5>>>> m_dailyBlobFrames;
+	std::vector<std::vector<std::vector<std::array<double, 6>>>> m_dailyBlobFrames;
 	std::vector<std::array<double, 10>> m_avgBlobStats;
 
 	FILE* m_ffmpeg;
