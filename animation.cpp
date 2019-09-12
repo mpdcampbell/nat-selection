@@ -121,9 +121,9 @@ void Animation::interpolateFrames()
 	if (m_cellSize < m_interpFrames)
 	{
 		m_interpFrames = m_cellSize;
-		std::cout << "Number of interpolated frames entered is greater than the ";
-		std::cout<< "number of pixels betwen grid spaces, framesPerStep was set to";
-		std::cout << " one pixel increments, framesPerStep = " << m_interpFrames << "\n";
+		std::cout << "Number of interpolated frames entered is greater than the "
+			"number of pixels betwen grid spaces, framesPerStep was set to"
+			" one pixel increments, framesPerStep = " << m_interpFrames << "\n";
 	}
 	else if (m_interpFrames == 0)
 	{
@@ -132,7 +132,8 @@ void Animation::interpolateFrames()
 
 	std::vector<std::vector<std::vector<std::array<double, 5>>>> tempDailyFrameArray;
 	std::vector< std::vector<std::array<double, 5>>> tempFrameArray;
-	
+	int sameCount{ 0 };
+	int notSameCount{ 0 };
 	for (auto day : m_dailyBlobFrames)
 	{
 		int frameCount{ static_cast<int>(day.size())};
@@ -146,8 +147,25 @@ void Animation::interpolateFrames()
 				std::array<double, 2> positionTwo{ day[i+1][j][0], day[i+1][j][1] };				
 				if (positionOne != positionTwo)
 				{
+					std::array<double, 3> statsOne{ day[i][j][2], day[i][j][3], day[i][j][4] };
+					std::array<double, 3> statsTwo{ day[i + 1][j][2], day[i + 1][j][3], day[i + 1][j][4] };
+					if (statsOne == statsTwo)
+					{
+						++sameCount;
+					}
+					if (statsOne != statsTwo)
+					{
+						++notSameCount;
+					}
 					if (positionOne[0] != positionTwo[0])
 					{
+						/*
+						int stepTest( (positionTwo[0] - positionOne[0]) );
+						if (std::abs(stepTest) != 1)
+						{
+							std::cout << "Pos1: " << positionOne[0] << ", Pos2:" << positionTwo[0] << "\n";
+						}
+						*/
 						double increment{ ((positionTwo[0] - positionOne[0]) / m_interpFrames) };
 						for (int k{ 0 }; k < m_interpFrames; ++k)
 						{
@@ -157,6 +175,13 @@ void Animation::interpolateFrames()
 					}
 					else
 					{
+						/*
+						int stepTest( (positionTwo[1] - positionOne[1]) );
+						if (std::abs(stepTest) != 1)
+						{
+							std::cout << "Pos1: " << positionOne[1] << ", Pos2:" << positionTwo[1] << "\n";
+						}
+						*/
 						double increment{ ((positionTwo[1] - positionOne[1]) / m_interpFrames) };
 						for (int k{ 0 }; k < m_interpFrames; ++k)
 						{
@@ -172,6 +197,8 @@ void Animation::interpolateFrames()
 		tempFrameArray.clear();
 	}
 	m_dailyBlobFrames = tempDailyFrameArray;
+
+	std::cout << "Same: " << sameCount << ", Diff: " << notSameCount << "\n";
 }
 
 void Animation::drawColourBar()

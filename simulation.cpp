@@ -20,7 +20,10 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simu
 		stats.recordBlobFrame(blobArray);
 		for (int i{ 0 }; i < length; ++i)
 		{
-			for (int step{ 0 }; step < blobArray[i].getSpeed(); ++step)
+			//std::array<int, 2> positionOne{ blobArray[i].getXPosition(), blobArray[i].getYPosition() };
+			
+			//Start at one so blobs with speed < 1 don't take a step
+			for (int step{ 1 }; step < blobArray[i].getSpeed(); ++step)
 			{
 				if (blobArray[i].getEnergy() >= blobArray[i].getCost())
 				{
@@ -63,6 +66,16 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simu
 					}
 				}
 			}
+			/*
+			std::array<int, 2> positionTwo{ blobArray[i].getXPosition(), blobArray[i].getYPosition() };
+			int xdif = positionOne[0] -positionTwo[0];
+			int ydif = positionOne[1] - positionTwo[1];
+			int distAway{ std::abs(xdif) + std::abs(ydif) };
+			if (distAway != static_cast<int>(blobArray[i].getSpeed()))
+			{
+				std::cout << "Speed:" << blobArray[i].getSpeed() << ", " << "Steps: " << distAway << "\n";
+			}
+			*/
 		}
 	} while (staminaCheck);
 };
