@@ -72,6 +72,10 @@ public:
 	   
 	void drawBlob(int x, int y, double scaledStat);
 
+	void openPipe(FILE* &m_ffmpeg);
+
+	void closePipe(FILE* &m_ffmpeg);
+
 	bool OnUserCreate() override;
 
 	bool OnUserUpdate(float fElapsedTime) override;

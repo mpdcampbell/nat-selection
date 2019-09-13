@@ -104,13 +104,13 @@ void Animation::scaleStats(double scaleRange)
 		{
 			for (int k{ 0 }; k < (m_dailyBlobFrames[i])[j].size(); ++k)
 			{
-				double size = m_dailyBlobFrames[i][j][k][2];
-				double speed = m_dailyBlobFrames[i][j][k][3];
-				double sense = m_dailyBlobFrames[i][j][k][4];
+				double size = m_dailyBlobFrames[i][j][k][ColourStat::SIZE];
+				double speed = m_dailyBlobFrames[i][j][k][ColourStat::SPEED];
+				double sense = m_dailyBlobFrames[i][j][k][ColourStat::SENSE];
 
-				m_dailyBlobFrames[i][j][k][2] = size * (scaleRange / maxSizeVal);
-				m_dailyBlobFrames[i][j][k][3] = speed * (scaleRange / maxSpeedVal);
-				m_dailyBlobFrames[i][j][k][4] = sense * (scaleRange / maxSenseVal);
+				m_dailyBlobFrames[i][j][k][ColourStat::SIZE] = size * (scaleRange / maxSizeVal);
+				m_dailyBlobFrames[i][j][k][ColourStat::SPEED] = speed * (scaleRange / maxSpeedVal);
+				m_dailyBlobFrames[i][j][k][ColourStat::SENSE] = sense * (scaleRange / maxSenseVal);
 			}
 		}
 	}
@@ -199,7 +199,7 @@ void Animation::drawTriLabel(int x2, int yZero, int textScale, TriLabel label)
 			break;
 		case TriLabel::MAX:
 			labelStr = "Max";
-			if (std::abs(val2 - val) >= (1.5*m_colourBarMax / m_gridCount))
+			if (std::abs(val2 - val) >= (1.25*m_colourBarMax / m_gridCount))
 			{
 				val = val2;
 				break;
@@ -210,7 +210,7 @@ void Animation::drawTriLabel(int x2, int yZero, int textScale, TriLabel label)
 			}
 		case TriLabel::MIN:
 			labelStr = "Min";
-			if (std::abs(val2 - val) >= (1.5*m_colourBarMax / m_gridCount))
+			if (std::abs(val2 - val) >= (1.25*m_colourBarMax / m_gridCount))
 			{
 				val = val2;
 				break;
@@ -379,6 +379,32 @@ void Animation::drawBlob(int x, int y, double s)
 	}
 }
 
+void Animation::openPipe(FILE* &m_ffmpeg)
+{
+	std::string cmd = "ffmpeg -r 60 -f rawvideo -pix_fmt rgba -s " +
+		std::to_string(m_xRes) + "x" + std::to_string(m_yRes) +
+		" -i - -threads 0 -preset medium -y -pix_fmt yuv420p -crf 18 -r 60 -vf vflip "
+		+ m_vidName + ".mp4";
+	const char * chrCmd = cmd.c_str();
+	// _WIN32 = we're in windows
+	#ifdef _WIN32
+	m_ffmpeg = _popen(chrCmd, "wb");
+	#else
+	ffmpeg = popen(cmd, "w");
+	#endif
+	m_buffer = new int[m_xRes*m_yRes];
+}
+
+void Animation::closePipe(FILE* &m_ffmpeg)
+{
+	#ifdef _WIN32
+	_pclose(m_ffmpeg);
+	#else
+	pclose(m_ffmpeg);
+	#endif
+	delete m_buffer;
+}
+
 bool Animation::OnUserCreate()
 {
 	//Variables needed during onUserUpdate
@@ -414,16 +440,8 @@ bool Animation::OnUserCreate()
 	//Normalise stat values for color bar and blob colors
 	scaleStats(m_scaleRange);
 	interpolateFrames();
-
-	//Open pipe ffmpeg and generate empty buffer 
-	std::string cmd = "ffmpeg -r 60 -f rawvideo -pix_fmt rgba -s " +
-		std::to_string(m_xRes) + "x" + std::to_string(m_yRes) +
-		" -i - -threads 0 -preset medium -y -pix_fmt yuv420p -crf 18 -r 60 -vf vflip "
-		+ m_vidName +".mp4";
-	const char * chrCmd = cmd.c_str();
-	m_ffmpeg = _popen(chrCmd, "wb");
-	m_buffer = new int[m_xRes*m_yRes];
-	
+	openPipe(m_ffmpeg);
+		
 	return true;
 }
 
@@ -500,13 +518,14 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 			}
 		}
 	}
+	++m_frame;
 
 	//Read the displayed pixels and copy into m_buffer
 	glReadPixels(0, 0, m_xRes, m_yRes, GL_RGBA, GL_UNSIGNED_BYTE, m_buffer);
 	//Send m_buffer to ffmpeg via the pipe
 	fwrite(m_buffer, sizeof(int)*m_xRes*m_yRes, 1, m_ffmpeg);
 	
-	++m_frame;
+
 
 	/*If completed all frames for that day, move onto next day and
 	reset the frame counter to zero*/
@@ -515,8 +534,7 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 		//When finished all days, end animation
 		if (m_day == m_dailyBlobFrames.size()-1)
 		{
-			_pclose(m_ffmpeg);
-			delete m_buffer;
+			closePipe(m_ffmpeg);
 			return false;
 		}
 		else
