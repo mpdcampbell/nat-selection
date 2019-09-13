@@ -199,7 +199,7 @@ void Animation::drawTriLabel(int x2, int yZero, int textScale, TriLabel label)
 			break;
 		case TriLabel::MAX:
 			labelStr = "Max";
-			if (std::abs(val2 - val) >= (1.25*m_colourBarMax / m_gridCount))
+			if (std::abs(val2 - val) >= (1.40*m_colourBarMax / m_gridCount))
 			{
 				val = val2;
 				break;
@@ -210,7 +210,7 @@ void Animation::drawTriLabel(int x2, int yZero, int textScale, TriLabel label)
 			}
 		case TriLabel::MIN:
 			labelStr = "Min";
-			if (std::abs(val2 - val) >= (1.25*m_colourBarMax / m_gridCount))
+			if (std::abs(val2 - val) >= (1.40*m_colourBarMax / m_gridCount))
 			{
 				val = val2;
 				break;
