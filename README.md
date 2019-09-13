@@ -1,5 +1,5 @@
 # nat-selection
-This is a recreation of the natural selection simulation demonstrated in a [youtube video](https://www.youtube.com/watch?v=0ZGbIKd0XrM), where creatures compete and their traits evolve depending on environment pressure. Primer has his own [github repository](https://github.com/Helpsypoo/primer), but none of his code was used here. The idea was to copy the simulation "rules" set out in the video and independently recreate it in C++. The simulation runs in its entirety offscreen, then [gnuplot](http://www.gnuplot.info/) is used, via the [gnuplot-iostream api](https://github.com/dstahlke/gnuplot-iostream), to produce plots of how the population number and the creature traits changed. Additionally, a 2D animation of the simulation is displayed, using the [olcPixelGameEngine library](https://github.com/OneLoneCoder/olcPixelGameEngine), as each generated frame is passed to [ffmpeg](https://ffmpeg.org/) to create a local video. 
+This is a recreation of the natural selection simulation demonstrated in a [youtube video](https://www.youtube.com/watch?v=0ZGbIKd0XrM), where creatures compete and their traits evolve depending on environment pressure. Primer has his own [github repository](https://github.com/Helpsypoo/primer), but none of his code was used here. The idea was to copy the simulation "rules" set out in the video and independently recreate it in C++. The simulation runs in its entirety offscreen, then [gnuplot](http://www.gnuplot.info/) is used (via the [gnuplot-iostream api](https://github.com/dstahlke/gnuplot-iostream)) to produce plots of how the population number and the creature traits changed. Additionally, a 2D animation of the simulation is displayed, using the [olcPixelGameEngine library](https://github.com/OneLoneCoder/olcPixelGameEngine), as each generated frame is passed to [ffmpeg](https://ffmpeg.org/) to create a local video. 
 
 #### **Example Graphs**
 
@@ -31,7 +31,7 @@ However, each of these traits has an energy cost. A blob starts each day with an
 
  ## External Requirements To Run
   - Install gnuplot *(last tested with version 5.2.7)*
-  - Install ffmpeg *(last tested with windows build 4.2)*
+  - Install ffmpeg *(last tested with version 4.2)*
   - The boost C++ libraries *(tested with version 1.70.0)*
 
   #### gnuplot installation
