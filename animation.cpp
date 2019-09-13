@@ -319,64 +319,79 @@ void Animation::drawBlob(int x, int y, double s)
 	int b = m_cellSize / 8;
 
 	//y
-	for (i = 0; i < b; ++i)
-	{
-		DrawLine(x + (2*b), y + i, x + (6*b), y + i, lightBTR);
-	}
+	FillRect(x + (2 * b), y, (4 * b), b, lightBTR);
 	//y+1
-	for (i = 0; i < b; ++i)
-	{
-	DrawLine(x + (1*b), y + (1*b)+i, x + (7*b), y + (1*b)+i, lightBTR);
-	}
+	FillRect(x + (1 * b), y+(1*b), (6 * b), b, lightBTR);
 	//y+2
-	for (i = 0; i < b; ++i)
-	{
-		DrawLine(x, y + (2*b)+i, x + (4*b), y + (2*b)+i, lightBTR);
-		DrawLine(x + (4*b), y + (2*b)+i, x + (8*b), y + (2*b)+i, midBTR);
-	}
+	FillRect(x, y + (2 * b), (4 * b), b, lightBTR);
+	FillRect(x + (4 * b), y + (2 * b), (4 * b), b, midBTR);
 	//y+3
 	FillRect(x, y + (3 * b), b, b, lightBTR);
 	FillRect(x + (1 * b), y + (3 * b), b, b, midBTR);
 	FillRect(x + (2 * b), y + (3 * b), b, b, white);
-	for (i = 0; i < b; ++i)
-	{
-		DrawLine(x + (3*b), y + (3*b)+i, x + (5*b), y + (3*b)+i, midBTR);
-	}
-	FillRect(x + (6 * b), y + (3 * b), b, b, white);
-	for (i = 0; i < b; ++i)
-	{
-		DrawLine(x + (6*b), y + (3*b)+i, x + (8*b), y + (3*b)+i, midBTR);
-	}
+	FillRect(x + (3 * b), y + (3 * b), (2 * b), b, midBTR);
+	FillRect(x + (5 * b), y + (3 * b), b, b, white);
+	FillRect(x + (6 * b), y + (3 * b), (2 * b), b, midBTR);
 	//y+4
 	FillRect(x, y + (4 * b), b, b, midBTR);
 	FillRect(x + (1 * b), y + (4 * b), b, b, darkBTR);
-	FillRect(x + (2*b), y + (4*b),b,b, blackBTR);
-	for (i = 0; i < b; ++i)
-	{
-		DrawLine(x + (3*b), y + (4*b)+i, x + (5*b), y + (4*b)+i, darkBTR);
-	}
+	FillRect(x + (2 * b), y + (4 * b), b, b, blackBTR);
+	FillRect(x + (3 * b), y + (4 * b), (2*b), b, darkBTR);
 	FillRect(x + (5 * b), y + (4 * b), b, b, blackBTR);
-	for (i = 0; i < b; ++i)
-	{
-		DrawLine(x + (6*b), y + (4*b)+i, x + (8*b), y + (4*b)+i, midBTR);
-	}
+	FillRect(x + (6 * b), y + (4 * b), (2 * b), b, midBTR);
 	//y+5
-	for (i = 0; i < b; ++i)
-	{
-		DrawLine(x, y + (5*b)+i, x + (2*b), y + (5*b)+i, midBTR);
-		DrawLine(x + (2*b), y + (5*b)+i, x + (7*b), y + (5*b)+i, darkBTR);
-	}
-	FillRect(x + (7 * b)+1, y + (5 * b), b, b, midBTR);
+	FillRect(x, y + (5 * b), (2 * b), b, midBTR);
+	FillRect(x + (2 * b), y + (5 * b),(5*b), b, darkBTR);
+	FillRect(x + (7 * b), y + (5 * b), b, b, midBTR);
 	//y+6
-	for (i = 0; i < b; ++i)
-	{
-		DrawLine(x + (1*b), y + (6*b)+i, x + (7*b), y + (6*b)+i, darkBTR);
-	}
+	FillRect(x + (1 * b), y + (6 * b), (6*b), b, darkBTR);
 	//y+7
-	for (i = 0; i < b; ++i)
-	{
-		DrawLine(x + (2*b), y + (7*b)+i, x + (6*b), y + (7*b)+i, darkBTR);
-	}
+	FillRect(x + (2 * b), y + (7 * b), (4 * b), b, darkBTR);
+}
+
+void Animation::drawFood(int x, int y)
+{
+	olc::Pixel lightestGreen{ 186, 246, 117 };
+	olc::Pixel lightGreen{ 152, 228, 59};
+	olc::Pixel midGreen{ 112, 162, 38 };
+	olc::Pixel darkGreen{ 86, 108, 56 };
+	olc::Pixel brown{ 115, 62, 57 };
+	olc::Pixel white{ 255,255,255,255 };
+
+	int i{ 0 };
+	int b = m_cellSize / 8;
+
+	//y
+	FillRect(x + (4 * b), y, b, b, brown);
+	//y+1
+	FillRect(x + (3 * b), y+(1*b), b, b, brown);
+	//y+2
+	FillRect(x + (1 * b), y + (2 * b), b, b, midGreen);
+	FillRect(x + (2 * b), y + (2 * b), b, b, lightGreen);
+	FillRect(x + (3 * b), y + (2 * b), b, b, brown);
+	FillRect(x + (4 * b), y + (2 * b), (2*b), b, lightGreen);
+	//y+3
+	FillRect(x, y + (3 * b), b, b, darkGreen);
+	FillRect(x + b, y + (3 * b), b, b, midGreen);
+	FillRect(x + (2 * b), y + (3 * b), (3 * b), b, lightGreen);
+	FillRect(x + (5 * b), y + (3 * b), b, b, lightestGreen);
+	FillRect(x + (6 * b), y + (3 * b), b, b, lightGreen);
+	//y+4
+	FillRect(x, y + (4 * b), b, b, darkGreen);
+	FillRect(x + b, y + (4 * b), b, b, midGreen);
+	FillRect(x + (2 * b), y + (4 * b), (2 * b), b, lightGreen);
+	FillRect(x + (4 * b), y + (4 * b), b, b, lightestGreen);
+	FillRect(x + (5 * b), y + (4 * b), b, b, white);
+	FillRect(x + (6 * b), y + (4 * b), b, b, lightGreen);
+	//y+5
+	FillRect(x, y + (5 * b), b, b, darkGreen);
+	FillRect(x + b, y + (5 * b), b, b, midGreen);
+	FillRect(x + (2 * b), y + (5 * b), (5 * b), b, lightGreen);
+	//y+6
+	FillRect(x, y + (6 * b), (2*b), b, darkGreen);
+	FillRect(x + (2*b), y + (6 * b), (5*b), b, midGreen);
+	//y+7
+	FillRect(x+b, y + (7 * b), (5 * b), b, darkGreen);
 }
 
 void Animation::openPipe(FILE* &m_ffmpeg)
@@ -481,7 +496,7 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	for (int x = m_blackBorder+1; x < m_gridCount + m_blackBorder + 1; ++x)
 	{
 		for (int y = m_blackBorder + 1; y < m_gridCount + m_blackBorder + 1; ++y)
-		{;
+		{
 			FillRect(x * m_cellSize, y * m_cellSize, m_cellSize, m_cellSize, olc::WHITE);
 		}
 	}
@@ -490,12 +505,10 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	drawColourBar();
 
 	//Draw Food onto map
-	std::string sImageFile = "greenApple.png";
-	olc::Sprite greenApple(sImageFile);
 	int appleScale{ m_cellSize / 8 };
 	for (Food food : m_eachFoodPositions[m_day])
 	{
-		DrawSprite((food.getXPosition() + m_blackBorder)* m_cellSize, (food.getYPosition() + m_blackBorder)* m_cellSize, &greenApple, appleScale);
+		drawFood((food.getXPosition() + m_blackBorder)* m_cellSize, (food.getYPosition() + m_blackBorder)* m_cellSize);
 	}
 	
 	//Draw Blobs onto map
@@ -518,14 +531,13 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 			}
 		}
 	}
-	++m_frame;
-
+	
 	//Read the displayed pixels and copy into m_buffer
 	glReadPixels(0, 0, m_xRes, m_yRes, GL_RGBA, GL_UNSIGNED_BYTE, m_buffer);
 	//Send m_buffer to ffmpeg via the pipe
 	fwrite(m_buffer, sizeof(int)*m_xRes*m_yRes, 1, m_ffmpeg);
 	
-
+	++m_frame;
 
 	/*If completed all frames for that day, move onto next day and
 	reset the frame counter to zero*/

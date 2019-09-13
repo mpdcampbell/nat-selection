@@ -72,6 +72,8 @@ public:
 	   
 	void drawBlob(int x, int y, double scaledStat);
 
+	void drawFood(int x, int y);
+
 	void openPipe(FILE* &m_ffmpeg);
 
 	void closePipe(FILE* &m_ffmpeg);
