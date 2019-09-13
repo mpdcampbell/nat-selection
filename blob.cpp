@@ -495,7 +495,7 @@ bool Blob::atHome()
 	{
 		return true;
 	}
-	else if (m_yPosition == 0 || m_yPosition >= m_mapSize + 1)
+	if (m_yPosition == 0 || m_yPosition >= m_mapSize + 1)
 	{
 		return true;
 	}

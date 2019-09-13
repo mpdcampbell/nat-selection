@@ -9,16 +9,23 @@
 #include "simulationResults.h"
 #include "olcPixelGameEngine.h"
 
-enum class ColourStat
-{
-	SIZE = 2,
-	SPEED = 3,
-	SENSE = 4
-};
-
-
 class Animation : public olc::PixelGameEngine
 {
+public:
+	enum ColourStat
+	{
+		SIZE = 2,
+		SPEED = 3,
+		SENSE = 4
+	};
+
+	enum TriLabel
+	{
+		MEAN = -1,
+		MAX = +2,
+		MIN = +5
+	};
+
 private:
 	int m_blackBorder;
 	int m_screenCount;
@@ -34,7 +41,7 @@ private:
 	ColourStat m_colourStat;
 	simulationResults m_stats;
 	std::vector<std::vector<Food>> m_eachFoodPositions;
-	std::vector<std::vector<std::vector<std::array<double, 5>>>> m_dailyBlobFrames;
+	std::vector<std::vector<std::vector<std::array<double, 6>>>> m_dailyBlobFrames;
 	std::vector<std::array<double, 10>> m_avgBlobStats;
 
 	FILE* m_ffmpeg;
@@ -57,11 +64,19 @@ public:
 
 	void scaleStats(double scaleRange);
 
+	void Animation::drawTriLabel(int x2, int yZero, int textScale, TriLabel label);
+
 	void interpolateFrames();
 
 	void drawColourBar();
 	   
 	void drawBlob(int x, int y, double scaledStat);
+
+	void drawFood(int x, int y);
+
+	void openPipe(FILE* &m_ffmpeg);
+
+	void closePipe(FILE* &m_ffmpeg);
 
 	bool OnUserCreate() override;
 
