@@ -9,16 +9,23 @@
 #include "simulationResults.h"
 #include "olcPixelGameEngine.h"
 
-enum class ColourStat
-{
-	SIZE = 2,
-	SPEED = 3,
-	SENSE = 4
-};
-
-
 class Animation : public olc::PixelGameEngine
 {
+public:
+	enum ColourStat
+	{
+		SIZE = 2,
+		SPEED = 3,
+		SENSE = 4
+	};
+
+	enum TriLabel
+	{
+		MEAN = -1,
+		MAX = +2,
+		MIN = +5
+	};
+
 private:
 	int m_blackBorder;
 	int m_screenCount;
@@ -56,6 +63,8 @@ public:
 	std::string getDefaultFilename();
 
 	void scaleStats(double scaleRange);
+
+	void Animation::drawTriLabel(int x2, int yZero, int textScale, TriLabel label);
 
 	void interpolateFrames();
 

@@ -132,9 +132,6 @@ void Animation::interpolateFrames()
 
 	std::vector<std::vector<std::vector<std::array<double, 6>>>> tempDailyFrameArray;
 	std::vector< std::vector<std::array<double, 6>>> tempFrameArray;
-	int sameCount{ 0 };
-	int notSameCount{ 0 };
-
 	for (auto day : m_dailyBlobFrames)
 	{
 		int frameCount{ static_cast<int>(day.size())};
@@ -155,26 +152,8 @@ void Animation::interpolateFrames()
 						std::array<double, 2> positionTwo{ day[i + 1][k][0], day[i + 1][k][1] };
 						if (positionOne != positionTwo)
 						{
-
-							std::array<double, 3> statsOne{ day[i][j][2], day[i][j][3], day[i][j][4] };
-							std::array<double, 3> statsTwo{ day[i + 1][k][2], day[i + 1][k][3], day[i + 1][k][4] };
-							if (statsOne == statsTwo)
-							{
-								++sameCount;
-							}
-							if (statsOne != statsTwo)
-							{
-								++notSameCount;
-							}
-
 							if (positionOne[0] != positionTwo[0])
 							{
-								int stepTest((positionTwo[0] - positionOne[0]));
-								if (std::abs(stepTest) != 1)
-								{
-									std::cout << "Pos1: " << positionOne[0] << ", Pos2:" << positionTwo[0] << "\n";
-								}
-
 								double increment{ ((positionTwo[0] - positionOne[0]) / m_interpFrames) };
 								for (int m{ 0 }; m < m_interpFrames; ++m)
 								{
@@ -184,12 +163,6 @@ void Animation::interpolateFrames()
 							}
 							else
 							{
-								int stepTest( (positionTwo[1] - positionOne[1]) );
-								if (std::abs(stepTest)!= 1)
-								{
-									std::cout << "Pos1: " << positionOne[1] << ", Pos2:" << positionTwo[1] << "\n";
-								}
-
 								double increment{ ((positionTwo[1] - positionOne[1]) / m_interpFrames) };
 								for (int m{ 0 }; m < m_interpFrames; ++m)
 								{
@@ -208,7 +181,52 @@ void Animation::interpolateFrames()
 		tempFrameArray.clear();
 	}
 	m_dailyBlobFrames = tempDailyFrameArray;
-	std::cout << "Same: " << sameCount << ", Diff: " << notSameCount << "\n";
+}
+
+void Animation::drawTriLabel(int x2, int yZero, int textScale, TriLabel label)
+{
+	//Draws "Mean" by default
+	int index = m_colourStat + TriLabel::MEAN;
+	double val{ (m_avgBlobStats[m_day][index]) };
+	index = m_colourStat + label;
+	double val2{ (m_avgBlobStats[m_day][index]) };
+
+	std::string labelStr;
+	switch (label)
+	{
+		case TriLabel::MEAN:
+			labelStr = "Mean";
+			break;
+		case TriLabel::MAX:
+			labelStr = "Max";
+			if (std::abs(val2 - val) >= (1.5*m_colourBarMax / m_gridCount))
+			{
+				val = val2;
+				break;
+			}
+			else
+			{
+				return;
+			}
+		case TriLabel::MIN:
+			labelStr = "Min";
+			if (std::abs(val2 - val) >= (1.5*m_colourBarMax / m_gridCount))
+			{
+				val = val2;
+				break;
+			}
+			else
+			{
+				return;
+			}
+	}
+	double yPos = yZero + (1 - val / m_colourBarMax)*(m_gridCount*m_cellSize);
+	FillTriangle(x2 + (0.25* m_cellSize), yPos, x2 + (1.25*m_cellSize), yPos - (0.5*m_cellSize), 
+			x2 + (1.25*m_cellSize), yPos + (0.5*m_cellSize), olc::WHITE);
+	DrawString(x2 + (1.50 * m_cellSize), yPos - (0.75*m_cellSize), labelStr, olc::WHITE, textScale);
+	std::string valStr{ std::to_string(val) };
+	valStr.resize(4);
+	DrawString(x2 + (1.50 * m_cellSize), yPos, valStr, olc::WHITE, textScale);
 }
 
 void Animation::drawColourBar()
@@ -217,79 +235,49 @@ void Animation::drawColourBar()
 	Red = 228, 59, 68
 	Magenta = 228, 59, 152
 	Blue = 0, 149, 233 */
-	int x = ((m_homeCount + 2 * m_blackBorder)*m_cellSize);
+
+	int xZero = ((m_homeCount + 2 * m_blackBorder)*m_cellSize);
+	int x2{ xZero + 2 * m_cellSize };
 	double step_r{ 0.0 }, step_g{ 0.0 }, step_b{ 0.0 };
 	int n{ 0 };
 	int yZero{ (m_blackBorder + 1)*m_cellSize }; // Where the colour bar starts
-	for (int y = yZero; y < ((m_gridCount + m_blackBorder + 1)*m_cellSize); ++y)
+	int yLength{ m_gridCount*m_cellSize };
+	for (int y = yZero; y < yZero + yLength; ++y)
 	{
 		olc::Pixel RtMtB(228 - step_r, 59 + step_g, 68.0 + step_b);
-		DrawLine(x, y, x + (2 * m_cellSize), y, RtMtB);
+		DrawLine(xZero, y, x2, y, RtMtB);
 		++n;
 
 		if (n < (m_gridCount*m_cellSize) / 2)
 		{
-			step_b += ((152.0 - 68.0) / ((m_gridCount*m_cellSize) / 2));
+			step_b += ((152.0 - 68.0) / (yLength / 2));
 		}
 		else if (n >= (m_gridCount*m_cellSize) / 2)
 		{
-			step_r += ((228.0) / ((m_gridCount*m_cellSize) / 2));
-			step_g += ((149.0 - 59.0) / ((m_gridCount*m_cellSize) / 2));
-			step_b += ((233.0 - 152.0) / ((m_gridCount*m_cellSize) / 2));
+			step_r += ((228.0) / (yLength / 2));
+			step_g += ((149.0 - 59.0) / (yLength / 2));
+			step_b += ((233.0 - 152.0) / (yLength / 2));
 		}
 	}
 
 	//Write which blob stat the colour bar measures
 	std::string colourStatStr{ getColourStatStr() };
 	int textScale{ m_blackBorder * m_cellSize / 16 };
-	DrawString((x - textScale * 7), (m_blackBorder*m_cellSize / 2), colourStatStr, olc::WHITE, textScale);
+	DrawString((xZero - textScale * 7), (m_blackBorder*m_cellSize / 2), colourStatStr, olc::WHITE, textScale);
 
 	//Write max colour bar value
 	std::string maxValStr = std::to_string(m_colourBarMax);
 	maxValStr.resize(4);
 	textScale = (m_blackBorder*m_cellSize / 20);
-	DrawString((x - textScale * 3), ((m_blackBorder + 1)*m_cellSize - textScale * 9), maxValStr, olc::WHITE, textScale);
+	DrawString((xZero - textScale * 3),yZero - (textScale * 9), maxValStr, olc::WHITE, textScale);
 
 	//Write min colour bar value
-	DrawString(x - textScale * 3, (m_gridCount + m_blackBorder + 1)*m_cellSize + textScale * 2, "0.00", olc::WHITE, textScale);
+	DrawString(xZero - textScale * 3, yZero + yLength + (textScale * 2), "0.00", olc::WHITE, textScale);
 
-	// Draw mean value triangle
-	int avgStatIndex{ static_cast<int>(m_colourStat) - 1 }; //index of average colour stat in m_avgBlobStats
-	double avgStatVal{ (m_avgBlobStats[m_day][avgStatIndex]) };
-	double yMean = yZero + (1 - avgStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily mean value is
-	FillTriangle(x + (2.25* m_cellSize), yMean, x + (3.25*m_cellSize), yMean - (0.5*m_cellSize), x + (3.25*m_cellSize), yMean + (0.5*m_cellSize), olc::WHITE);
-	DrawString(x + (3.50 * m_cellSize), yMean - (0.75*m_cellSize), "Mean", olc::WHITE, textScale);
-	std::string avgValStr{ std::to_string(avgStatVal) };
-	avgValStr.resize(4);
-	DrawString(x + (3.50 * m_cellSize), yMean, avgValStr, olc::WHITE, textScale);
-
-	// Draw max value triangle
-	int maxStatIndex{ static_cast<int>(m_colourStat) + 2 }; //index of max colour stat in m_avgBlobStats
-	double maxStatVal{ (m_avgBlobStats[m_day][maxStatIndex]) };
-	int yMax = yZero + (1 - maxStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily max value is
-	//if the max val triangle doesn't overlap mean triangle, draw
-	if (std::abs(yMean - yMax) >= m_cellSize)
-	{
-		FillTriangle(x + (2.25* m_cellSize), yMax, x + (3.25 * m_cellSize), yMax - (0.5*m_cellSize), x + (3.25 * m_cellSize), yMax + (0.5*m_cellSize), olc::WHITE);
-		DrawString(x + (3.50 * m_cellSize), yMax - (0.75*m_cellSize), "Max", olc::WHITE, textScale);
-		std::string dailyMaxStr{ std::to_string(maxStatVal) };
-		dailyMaxStr.resize(4);
-		DrawString(x + (3.50 * m_cellSize), yMax, dailyMaxStr, olc::WHITE, textScale);
-	}
-
-	// Draw min value triangle
-	int minStatIndex{ static_cast<int>(m_colourStat) + 5 }; //index of min colour stat in m_avgBlobStats
-	double minStatVal{ (m_avgBlobStats[m_day][minStatIndex]) };
-	int yMin = yZero + (1 - minStatVal / m_colourBarMax)*(m_gridCount*m_cellSize); //where along colour bar the daily min value is
-	//if the min val triangle doesn't overlap mean triangle, draw
-	if (std::abs(yMean - yMin) >= m_cellSize)
-	{
-		FillTriangle(x + (2.25* m_cellSize), yMin, x + (3.25 * m_cellSize), yMin - (0.5*m_cellSize), x + (3.25 * m_cellSize), yMin + (0.5*m_cellSize), olc::WHITE);
-		DrawString(x + (3.50 * m_cellSize), yMin - (0.75*m_cellSize), "Min", olc::WHITE, textScale);
-		std::string dailyMinStr{ std::to_string(minStatVal) };
-		dailyMinStr.resize(4);
-		DrawString(x + (3.50 * m_cellSize), yMin, dailyMinStr, olc::WHITE, textScale);
-	}
+	// Draw triangles and labels
+	drawTriLabel(x2, yZero, textScale, MEAN);
+	drawTriLabel(x2, yZero, textScale, MAX);
+	drawTriLabel(x2, yZero, textScale, MIN);
 }
 
 void Animation::drawBlob(int x, int y, double s)
@@ -327,7 +315,7 @@ void Animation::drawBlob(int x, int y, double s)
 		blackBTR = temp4;
 	}
 
-	int i;
+	int i{ 0 };
 	int b = m_cellSize / 8;
 
 	//y
@@ -423,7 +411,7 @@ bool Animation::OnUserCreate()
 		m_vidName = getDefaultFilename();
 	}
 
-	//Normalise stat values to 100, and insert frames
+	//Normalise stat values for color bar and blob colors
 	scaleStats(m_scaleRange);
 	interpolateFrames();
 
@@ -495,8 +483,7 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	//Draw Blobs onto map
 	for (auto element : (m_dailyBlobFrames[m_day])[m_frame])
 	{
-		int index{ static_cast<int>(m_colourStat) };
-		double scaledSize{ element[index] };
+		double scaledSize{ element[m_colourStat] };
 		drawBlob(((element[0] + m_blackBorder) * m_cellSize), (element[1] + m_blackBorder) * m_cellSize, scaledSize);
 
 		//If Blob overlaps food, then remove food from foodPosition array
@@ -539,14 +526,8 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 		}
 	}
 
-	
+	// Artificially limits fps max to 60 to stay below ffmpeg input rate
+	// std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
-	// Artificially limiting fps max to 60 to stay below ffmpeg input rate
-	
-	//if (fElapsedTime < (1/60))
-	//{
-	//	std::this_thread::sleep_for(std::chrono::milliseconds(16));
-	//}
-	
 	return true;
 }

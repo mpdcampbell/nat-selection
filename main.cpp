@@ -26,30 +26,30 @@ int main()
 	simulationResults stats;
 
 	//INITIAL BLOB STATS
-	double nativeEnergy{ 800.0 };
+	double nativeEnergy{ 300.0 };
 	double seedSize{ 2.0 };
 	double seedSpeed{ 2.0 };
-	double seedSense{ 1.0 };
+	double seedSense{ 3.0 };
 	Blob seedBlob{ nativeEnergy, seedSize, seedSpeed, seedSense };
 
 	//ENVIRONMENT VARIABLES
-	map.setMapSize(20); //Integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 40 }; //Starting number of Blobs
-	int foodCount{50}; //Number of food pieces place randomly on map daily
+	map.setMapSize(10); //Integer length, in grid spaces, of one side of the square map
+	int seedBlobCount{ 10 }; //Starting number of Blobs
+	int foodCount{12}; //Number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
 	g_mutationProb = 30; //Integer probability (%) of a blob stat mutating during replication
-	int dayCount{ 100 }; //Length of simulation in days
+	int dayCount{ 20 }; //Length of simulation in days
 	int simCount{ 1 }; //Number of repeat simulations run
 
 	//GRAPH VARIABLES
 	int firstSim{ 0 }, lastSim{ 0 }; //Range of simulation runs to create histogram gifs for
 
 	//ANIMATION VARIABLES
-	int yResolution{ 800 }; //Animation window resolution in pixels
+	int yResolution{ 700 }; //Animation window resolution in pixels
 	int xResolution{ 1100 };
 	int framesPerStep{ 5 }; //Controls how smooth blob moves from grid space to grid space
-	ColourStat colourStat{ ColourStat::SIZE }; // SIZE, SPEED or SENSE the stat blob colour refers to.
+	Animation::ColourStat colourStat{ Animation::SPEED }; // SIZE, SPEED or SENSE
 	std::string vidName{  }; //Video filename, if blank default of xM_xB_xF_xD_Stat is used
 
 	for (int sim{ 0 }; sim < simCount; ++sim)
@@ -81,7 +81,7 @@ int main()
 
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day
-	makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
+	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
 	//ANIMATION
 	Animation blobSim(map.getMapSize(), framesPerStep, stats, vidName, colourStat); //Creates animation object
@@ -90,6 +90,6 @@ int main()
 		blobSim.Start();
 	}
 
-	system("pause");
+	//system("pause");
 	return 0;
 }
