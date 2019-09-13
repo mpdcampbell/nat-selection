@@ -547,7 +547,14 @@ void Blob::searchPattern()
 		} 
 		else
 		{
-			--m_yPosition;
+			if (m_name % 2 == 0)
+			{
+				--m_yPosition;
+			}
+			else
+			{
+				++m_yPosition;
+			}
 		}
 	}
 	else
@@ -558,7 +565,14 @@ void Blob::searchPattern()
 		}
 		else
 		{
-			++m_yPosition;
+			if (m_name % 2 == 0)
+			{
+				++m_yPosition;
+			}
+			else
+			{
+				--m_yPosition;
+			}
 		}
 	}
 }
