@@ -2,26 +2,26 @@
 #include <string>
 #include "thing.h"
 
-Thing::Thing() : m_xPosition{ 0 }, m_yPosition{ 0 }, m_name{ "Thing" }
+Thing::Thing() : m_xPosition{ 0.0 }, m_yPosition{ 0.0 }, m_name{ "Thing" }
 {
 }
 
-Thing::Thing(int x, int y, std::string name)
+Thing::Thing(double x, double y, std::string name)
 	: m_xPosition{ x }, m_yPosition{ y }, m_name{ name }
 {
 }
 
-int Thing::getXPosition()
+double Thing::getXPosition()
 {
 	return m_xPosition;
 }
 
-int Thing::getYPosition()
+double Thing::getYPosition()
 {
 	return m_yPosition;
 }
 
-void Thing::setPosition(int x, int y)
+void Thing::setPosition(double x, double y)
 {
 	m_xPosition = x;
 	m_yPosition = y;

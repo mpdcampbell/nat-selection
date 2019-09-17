@@ -10,7 +10,8 @@ protected:
 
 public:
 	//Probably a better inheritance way to handle this
-	Food(int x, int y);
+	//Food(int x, int y);
+	Food(double x, double y);
 
 };
 

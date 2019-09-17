@@ -22,7 +22,7 @@ protected:
 	int m_foodEaten = 0;
 	int m_mapSize;
 	int m_name;
-	int m_birthday;
+	std::array<int, 2> m_stepTarget;
 
 public:
 
@@ -84,9 +84,11 @@ public:
 
 	bool atFood(Food &food);
 
+	void chooseHuntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
+
 	std::optional<int> huntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
 	
-	int distToObject(Thing &object);
+	double distToObject(Thing &object);
 
 	std::optional<int> lookForFood(std::vector<Food> &foodArray);
 
@@ -100,13 +102,21 @@ public:
 
 	void searchPattern();
 
-	int distToEdge();
+	double distToEdge();
 
 	bool hasSurplusStamina();
 
 	void mutate();
 
 	std::optional<Blob> tryToReplicate();
+
+	void setStepTarget(int x, int y);
+
+	std::array<int, 2>& getStepTarget();
+
+	void continueStep();
+
+	bool finishedStep();
 };
 
 #endif

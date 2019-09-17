@@ -454,7 +454,7 @@ bool Animation::OnUserCreate()
 
 	//Normalise stat values for color bar and blob colors
 	scaleStats(m_scaleRange);
-	interpolateFrames();
+	//interpolateFrames();
 	openPipe(m_ffmpeg);
 		
 	return true;

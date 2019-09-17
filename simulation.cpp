@@ -11,10 +11,46 @@ extern int g_nameHolder{ 0 };
 
 void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simulationResults &stats)
 {
-	bool staminaCheck;
+	bool hasStamina{ true };
+	stats.recordBlobFrame(blobArray);
+	for (int timeStep{ 0 }; hasStamina; ++timeStep)
+	{
+		hasStamina = false;
+		int blobCount{ static_cast<int>(blobArray.size()) };
+		for (int i{ 0 }; i < blobCount; ++i)
+		{
+			if (blobArray[i].getEnergy() >= blobArray[i].getCost())
+			{
+				hasStamina = true;
+				if (blobArray[i].finishedStep())
+				{
+					int foodEaten{ blobArray[i].getFoodEaten() };
+					if (foodEaten == 0)
+					{
+						blobArray[i].chooseHuntOrRun(blobArray, foodArray);
+					}
+					else if (foodEaten == 1 && blobArray[i].hasSurplusStamina())
+					{
+						blobArray[i].chooseHuntOrRun(blobArray, foodArray);
+				}
+					else
+					{
+						blobArray[i].goHome();
+					}
+				}
+				blobArray[i].continueStep();
+			}
+		}
+	std::cout << "Time step: " << timeStep << "\n";
+	stats.recordBlobFrame(blobArray);
+	}
+}
+	
+
+/*
 	do
 	{
-		staminaCheck = false;
+		bool staminaCheck = false;
 		int length{ static_cast<int>(blobArray.size()) };
 		//Before any steps are taken, capture the beginning frame
 		stats.recordBlobFrame(blobArray);
@@ -52,13 +88,13 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simu
 							/*if the eaten blob was before the hunting blob in the array
 							then the hunting blob element value has been reduced by one,
 							as all blobs after the eaten have shifted down one in stack,
-							filling the	gap*/
+							filling the	gap
 							--i;
 						}
 					}
 					/*If food was not eaten, reduce energy and record step.
 					otherwise the huntOrRun action was to eat, no step taken,
-					so go back through the loop*/
+					so go back through the loop
 					else if (blobArray[i].getFoodEaten() == foodEaten)
 					{
 						blobArray[i].reduceEnergy();
@@ -68,7 +104,8 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simu
 			}
 		}
 	} while (staminaCheck);
-};
+*/
+
 
 void naturalSelection(std::vector<Blob> &blobArray)
 {
