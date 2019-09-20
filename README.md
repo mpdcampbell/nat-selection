@@ -18,7 +18,7 @@ This is a recreation of the natural selection simulation demonstrated in a [yout
 <p align="center">
  <img src="/examples/mapSize8_60fps.gif" alt="" title="Simulation with mapSize of 8 (64 grid spaces)" width="417"  />
  <img src="/examples/test.png" alt="" title="" width ="200" />
- <img src="/examples/mapSize25_25fps.gif" alt="" title="Simulation with mapSize of 25 (125 grid spaces)" width="342" /><br \>
+ <img src="/examples/mapSize30_60fps.gif" alt="" title="Simulation with mapSize of 30 (900 grid spaces)" width="342" /><br \>
 </p>
 
 ### **Simulation Rules** 
