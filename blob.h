@@ -84,7 +84,7 @@ public:
 
 	bool atFood(Food &food);
 
-	void chooseHuntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
+	std::optional<int> chooseHuntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
 
 	std::optional<int> huntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
 	

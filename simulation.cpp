@@ -2,6 +2,7 @@
 #include <optional>
 #include <cassert>
 #include <string>
+#include <iostream>
 #include "food.h"
 #include "blob.h"
 #include "simulation.h"
@@ -22,31 +23,49 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simu
 			if (blobArray[i].getEnergy() >= blobArray[i].getCost())
 			{
 				hasStamina = true;
+				std::optional<int> blobEaten{ std::nullopt };
 				if (blobArray[i].finishedStep())
 				{
 					int foodEaten{ blobArray[i].getFoodEaten() };
 					if (foodEaten == 0)
 					{
-						blobArray[i].chooseHuntOrRun(blobArray, foodArray);
+						blobEaten = blobArray[i].chooseHuntOrRun(blobArray, foodArray);
 					}
 					else if (foodEaten == 1 && blobArray[i].hasSurplusStamina())
 					{
-						blobArray[i].chooseHuntOrRun(blobArray, foodArray);
-				}
+						blobEaten = blobArray[i].chooseHuntOrRun(blobArray, foodArray);
+					}
 					else
 					{
 						blobArray[i].goHome();
+					}
+					//if a prey blob was eaten
+					if (blobEaten.has_value())
+					{
+						//adjust the loop size
+						--blobCount;
+						if (i > blobEaten.value())
+						{
+							/*if the eaten blob was before the hunting blob in the array
+							then the hunting blob element value has been reduced by one,
+							as all blobs after the eaten have shifted down one in stack,
+							filling the	gap*/
+							--i;
+						}
 					}
 				}
 				blobArray[i].continueStep();
 			}
 		}
-	std::cout << "Time step: " << timeStep << "\n";
+		if (timeStep >= 1000)
+		{
+			hasStamina = false;
+		}
+	//std::cout << "Time step: " << timeStep << "\n";
 	stats.recordBlobFrame(blobArray);
 	}
 }
 	
-
 /*
 	do
 	{
