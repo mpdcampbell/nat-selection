@@ -34,7 +34,6 @@ private:
 	int m_cellSize;
 	int m_day;
 	int m_frame;
-	int m_interpFrames;
 	double m_scaleRange;
 	double m_colourBarMax;
 	bool m_paused;
@@ -53,7 +52,7 @@ private:
 public:
 	Animation();
 
-	Animation(int cellCount, int framesPerStep, simulationResults &stats, 
+	Animation(int cellCount, simulationResults &stats, 
 			std::string vidName, ColourStat stat );
 
 	bool colourStatValid();
@@ -66,13 +65,15 @@ public:
 
 	void Animation::drawTriLabel(int x2, int yZero, int textScale, TriLabel label);
 
-	void interpolateFrames();
-
 	void drawColourBar();
 	   
 	void drawBlob(int x, int y, double scaledStat);
 
+	//void drawBlob(double x, double y, double scaledStat);
+
 	void drawFood(int x, int y);
+
+	//void drawFood(double x, double y);
 
 	void openPipe(FILE* &m_ffmpeg);
 

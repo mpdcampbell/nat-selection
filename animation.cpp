@@ -17,10 +17,10 @@ Animation::Animation()
 	sAppName = "Natural Selection Simulation";
 }
 
-Animation::Animation(int cellCount, int framesPerStep,simulationResults &stats,
-		std::string vidName, ColourStat colourStat)
-		: m_gridCount{ cellCount }, m_interpFrames{ framesPerStep }, m_stats{ stats },
-		m_vidName{vidName}, m_colourStat{ colourStat }
+Animation::Animation(int cellCount, simulationResults &stats, std::string vidName,
+			ColourStat colourStat)
+			: m_gridCount{ cellCount }, m_stats{ stats }, m_vidName{vidName},
+			m_colourStat{ colourStat }
 {
 	sAppName = "Natural Selection Simulation";
 }
@@ -114,73 +114,6 @@ void Animation::scaleStats(double scaleRange)
 			}
 		}
 	}
-}
-
-void Animation::interpolateFrames()
-{
-	if (m_cellSize < m_interpFrames)
-	{
-		m_interpFrames = m_cellSize;
-		std::cout << "Number of interpolated frames entered is greater than the "
-			"number of pixels betwen grid spaces, framesPerStep was set to"
-			" one pixel increments, framesPerStep = " << m_interpFrames << "\n";
-	}
-	else if (m_interpFrames == 0)
-	{
-		return;
-	}
-
-	std::vector<std::vector<std::vector<std::array<double, 6>>>> tempDailyFrameArray;
-	std::vector< std::vector<std::array<double, 6>>> tempFrameArray;
-	for (auto day : m_dailyBlobFrames)
-	{
-		int frameCount{ static_cast<int>(day.size())};
-		for (int i{ 0 }; i<frameCount-1; ++i)
-		{
-			int blobCount1{ static_cast<int>(day[i].size()) };
-			int blobCount2{ static_cast<int>(day[i+1].size()) };
-			std::vector<std::array<double, 6>> iFrame = day[i];
-
-			for (int j{ 0 }; j < blobCount1; ++j)
-			{
-				double name{ day[i][j][5] };
-				for (int k{ 0 }; k < blobCount2; ++k)
-				{
-					if (name == day[i + 1][k][5])
-					{
-						std::array<double, 2> positionOne{ day[i][j][0], day[i][j][1] };
-						std::array<double, 2> positionTwo{ day[i + 1][k][0], day[i + 1][k][1] };
-						if (positionOne != positionTwo)
-						{
-							if (positionOne[0] != positionTwo[0])
-							{
-								double increment{ ((positionTwo[0] - positionOne[0]) / m_interpFrames) };
-								for (int m{ 0 }; m < m_interpFrames; ++m)
-								{
-									iFrame[j][0] = positionOne[0] + (increment*m);
-									tempFrameArray.push_back(iFrame);
-								}
-							}
-							else
-							{
-								double increment{ ((positionTwo[1] - positionOne[1]) / m_interpFrames) };
-								for (int m{ 0 }; m < m_interpFrames; ++m)
-								{
-									iFrame[j][1] = positionOne[1] + (increment*m);
-									tempFrameArray.push_back(iFrame);
-								}
-							}
-							k = blobCount2;
-							j = blobCount1;
-						}
-					}
-				}
-			}
-		}
-		tempDailyFrameArray.push_back(tempFrameArray);
-		tempFrameArray.clear();
-	}
-	m_dailyBlobFrames = tempDailyFrameArray;
 }
 
 void Animation::drawTriLabel(int x2, int yZero, int textScale, TriLabel label)
@@ -315,7 +248,6 @@ void Animation::drawBlob(int x, int y, double s)
 		blackBTR = temp4;
 	}
 
-	int i{ 0 };
 	int b = m_cellSize / 8;
 
 	//y
@@ -358,7 +290,6 @@ void Animation::drawFood(int x, int y)
 	olc::Pixel brown{ 115, 62, 57 };
 	olc::Pixel white{ 255,255,255,255 };
 
-	int i{ 0 };
 	int b = m_cellSize / 8;
 
 	//y
@@ -454,7 +385,6 @@ bool Animation::OnUserCreate()
 
 	//Normalise stat values for color bar and blob colors
 	scaleStats(m_scaleRange);
-	//interpolateFrames();
 	openPipe(m_ffmpeg);
 		
 	return true;
@@ -505,7 +435,6 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 	drawColourBar();
 
 	//Draw Food onto map
-	int appleScale{ m_cellSize / 8 };
 	for (Food food : m_eachFoodPositions[m_day])
 	{
 		drawFood((food.getXPosition() + m_blackBorder)* m_cellSize, (food.getYPosition() + m_blackBorder)* m_cellSize);
