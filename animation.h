@@ -69,11 +69,7 @@ public:
 	   
 	void drawBlob(int x, int y, double scaledStat);
 
-	//void drawBlob(double x, double y, double scaledStat);
-
 	void drawFood(int x, int y);
-
-	//void drawFood(double x, double y);
 
 	void openPipe(FILE* &m_ffmpeg);
 

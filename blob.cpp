@@ -629,7 +629,7 @@ void Blob::mutate()
 {
 	int prob{ 200/ g_mutationProb};
 	int num{ getRandomNumber(1, prob) };
-	int max{ 10 };
+
 	if (num == 1) 
 	{
 		int mult = getRandomNumber(1, 10);
@@ -638,14 +638,15 @@ void Blob::mutate()
 	}
 	else if (num == 2)
 	{
-		if (m_speed < 1.0)
-		{
-			max = static_cast<int>(m_speed * 10.0);
-		}
-		int mult = getRandomNumber(1, max);
+		int mult = getRandomNumber(1, 10);
 		double x{ m_speed - (mult / 10.0) };
+		if (x < 0.1)
+		{
+			x = 0.1;
+		}
 		setSpeed(x);
 	}
+
 	num = getRandomNumber(1, prob);
 	if (num == 1) 
 	{
@@ -655,15 +656,15 @@ void Blob::mutate()
 	}
 	else if (num == 2)
 	{
-		max = 10;
-		if (m_sense < 1.0)
-		{
-			max = static_cast<int>(m_sense * 10.0);
-		}
-		int mult = getRandomNumber(1, max);
+		int mult = getRandomNumber(1, 10);
 		double x{ m_sense - (mult / 10.0) };
+		if (x < 0.1)
+		{
+			x = 0.1;
+		}
 		setSense(x);
 	}
+
 	num = getRandomNumber(1, prob);
 	if (num == 1) 
 	{
@@ -673,15 +674,13 @@ void Blob::mutate()
 	}
 	else if (num == 2)
 	{
-		max = 10;
-		if (m_size < 1.0)
-		{
-			max = static_cast<int>(m_size * 10.0);
-		}
-		int mult = getRandomNumber(1, max);
+		int mult = getRandomNumber(1, 10);
 		double x{ m_size - (mult / 10.0) };
+		if (x < 0.1)
+		{
+			x = 0.1;
+		}
 		setSize(x);
-
 	}
 }
 
