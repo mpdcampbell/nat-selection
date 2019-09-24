@@ -49,8 +49,8 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simu
 					--blobCount;
 					if (i > blobEaten.value())
 					{
-						/*if the eaten blob was before the hunting blob in the array
-						then the hunting blob element value has been reduced by one,
+						/*if eaten blob was before hunting blob in the array
+						then hunting blob element value has been reduced by one,
 						as all blobs after the eaten have shifted down one in stack,
 						filling the	gap*/
 						--i;
@@ -58,7 +58,6 @@ void walkAndEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray, simu
 				}
 			}
 		}
-	//std::cout << "Time step: " << timeStep << "\n";
 	stats.recordBlobFrame(blobArray);
 	}
 }

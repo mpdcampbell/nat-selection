@@ -27,18 +27,18 @@ int main()
 
 	//INITIAL BLOB STATS
 	double nativeEnergy{ 1400.0 };
-	double seedSize{ 2.0 };
-	double seedSpeed{ 2.0 };
-	double seedSense{ 4.0 };
+	double seedSize{ 3.0 };
+	double seedSpeed{ 3.0 };
+	double seedSense{ 3.0 };
 	Blob seedBlob( nativeEnergy, seedSize, seedSpeed, seedSense);
 
 	//ENVIRONMENT VARIABLES
-	map.setMapSize( 30 ); //Integer length, in grid spaces, of one side of the square map
-	int seedBlobCount{ 200 }; //Starting number of Blobs
-	int foodCount{ 200 }; //Number of food pieces place randomly on map daily
+	map.setMapSize( 10 ); //Integer length, in grid spaces, of one side of the square map
+	int seedBlobCount{ 20 }; //Starting number of Blobs
+	int foodCount{ 30 }; //Number of food pieces place randomly on map daily
 
 	//SIMULATION VARIABLES
-	g_mutationProb = 40; //Integer probability (%) of a blob stat mutating during replication
+	g_mutationProb = 25; //Integer probability (%) of a blob stat mutating during replication
 	int dayCount{ 100 }; //Length of simulation in days
 	int simCount{ 1 }; //Number of repeat simulations run
 
@@ -46,8 +46,8 @@ int main()
 	int firstSim{ 0 }, lastSim{ 0 }; //Range of simulation runs to create histogram gifs for
 
 	//ANIMATION VARIABLES
-	int yResolution{ 1080 }; //Animation window resolution in pixels
-	int xResolution{ 1300 };
+	int yResolution{ 600 }; //Animation window resolution in pixels
+	int xResolution{ 850 };
 	Animation::ColourStat colourStat{ Animation::SPEED }; // SIZE, SPEED or SENSE
 	std::string vidName{  }; //Video filename, if blank default of xM_xB_xF_xD_Stat is used
 
@@ -81,7 +81,7 @@ int main()
 
 	//GRAPHS OUTPUT
 	makeAvgGraphs(stats); //line graph of population and mean size, speed and sense each day
-	//makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
+	makeHistogram(stats, firstSim, lastSim); //Creates gif of daily size, speed and sense distribution
 
 	//ANIMATION
 	Animation blobSim(map.getMapSize(), stats, vidName, colourStat); //Creates animation object

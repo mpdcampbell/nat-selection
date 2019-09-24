@@ -485,8 +485,8 @@ bool Animation::OnUserUpdate(float fElapsedTime)
 		}
 	}
 
-	// Artificially limits fps max to 60 to stay below ffmpeg input rate
-	// std::this_thread::sleep_for(std::chrono::milliseconds(16));
+	// Allows you to limit fps max to stay below ffmpeg input rate
+	// std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
 	return true;
 }

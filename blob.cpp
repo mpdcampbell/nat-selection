@@ -253,7 +253,8 @@ void Blob::stepAway(Thing &thing)
 		}
 		else
 		{
-			/*Blobs want to run from predator in general, movement not as restricted*/
+			/*Blobs want to run from predator in general, 
+			movement not as restricted*/
 			(std::abs(xdif) > std::abs(ydif)) ?
 				(xTarget -= xdif / std::abs(xdif)) :
 				(yTarget -= ydif / std::abs(ydif));
@@ -305,7 +306,7 @@ void Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray)
 		return;
 	}
 
-	//catch start ontop of food/prey error
+	//Start ontop of food / prey
 	if (foodDist == 0.0 || preyDist == 0.0)
 	{
 		setStepTarget(m_xPosition, m_yPosition);
@@ -353,7 +354,7 @@ std::optional<int> Blob::tryToEat(std::vector<Blob> &blobArray, std::vector<Food
 	{
 		int foodElement{ foodOpt.value() };
 		double foodDist = distToObject(foodArray[foodElement]);
-		if (foodDist == 0.0) //if ontop of food
+		if (foodDist == 0.0) 
 		{
 			//erase that food element
 			auto it = foodArray.begin();
@@ -366,7 +367,7 @@ std::optional<int> Blob::tryToEat(std::vector<Blob> &blobArray, std::vector<Food
 	{
 		int preyElement{ preyOpt.value() };
 		double preyDist = distToObject(blobArray[preyElement]);
-		if (preyDist == 0.0) //if ontop of prey
+		if (preyDist == 0.0)
 		{
 			auto it = blobArray.begin();
 			//erase that blob element
@@ -423,8 +424,7 @@ std::optional<int> Blob::lookForPrey(std::vector<Blob> &blobArray)
 	int length{ static_cast<int>(blobArray.size()) };
 	for (int i = 0; i < length; ++i)
 	{
-		/*is blob is 80% or less of my size and isn't at home then it is legitimate prey.
-		See if it falls within sense radius*/
+		/*if blob is 80% or less of size and isn't at home then it is legitimate prey.*/
 		if (blobArray[i].getSize() <= (0.8*m_size) && !(blobArray[i].atHome()))
 		{
 			double xPos{ blobArray[i].getXPosition() };
@@ -465,6 +465,7 @@ std::optional<int> Blob::lookForPredator(std::vector<Blob> &blobArray)
 	{
 		if ((0.8*blobArray[i].getSize()) >= m_size && !blobArray[i].atHome())
 		{
+			//Ignore predators that have ran out of energy
 			if (blobArray[i].getEnergy() >= blobArray[i].getCost())
 			{
 				double xPos{ blobArray[i].getXPosition() };
@@ -521,7 +522,8 @@ void Blob::goHome()
 		double ydif = m_yPosition - (m_mapSize / 2.0);
 		double xTarget{ m_xPosition };
 		double yTarget{ m_yPosition };
-		if (xdif == ydif) //centre diagonal
+		//centre diagonal
+		if (xdif == ydif) 
 		{
 			(yTarget >= m_mapSize / 2.0) ?
 				(++yTarget) : (--yTarget);
@@ -614,10 +616,7 @@ bool Blob::hasSurplusStamina()
 	/*if remaining stamina is greater than that needed to get to
 	closest edge then blob has spare stamina. The +1 is for case
 	where blob has spare stamina then steps	one away, reducing its
-	stamina by one and increasing the needed stamina by one.
-	This effective +2 means without +1 error margin blob would
-	make the wrong choice, and be unable to get home
-	*/
+	stamina by one and increasing the needed stamina by one.*/
 	if ((m_energy / getCost()) <= dist + 1.0)
 	{
 		return false;
