@@ -22,7 +22,7 @@ protected:
 	int m_foodEaten = 0;
 	int m_mapSize;
 	int m_name;
-	int m_birthday;
+	std::array<double, 2> m_stepTarget;
 
 public:
 
@@ -42,6 +42,10 @@ public:
 
 	void setSpeed(double x);
 
+	double getSize();
+
+	void setSize(double x);
+
 	double getCost();
 
 	double getEnergy();
@@ -50,13 +54,9 @@ public:
 
 	void setEnergy(double x);
 
-	double getSize();
-
-	void setSize(double x);
+	int getMapSize();
 
 	void setMapSize(int x);
-
-	int getMapSize();
 
 	int getFoodEaten();
 
@@ -82,17 +82,7 @@ public:
 
 	void stepAway(Thing &thing);
 
-	bool atFood(Food &food);
-
-	std::optional<int> huntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
-	
-	int distToObject(Thing &object);
-
-	std::optional<int> lookForFood(std::vector<Food> &foodArray);
-
-	std::optional<int> lookForPrey(std::vector<Blob> &blobArray);
-
-	std::optional<int> lookForPredator(std::vector<Blob> &blobArray);
+	double distToObject(Thing &object);
 
 	bool atHome();
 
@@ -100,13 +90,31 @@ public:
 
 	void searchPattern();
 
-	int distToEdge();
+	double distToEdge();
 
 	bool hasSurplusStamina();
+
+	void huntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
+	
+	std::optional<int> lookForFood(std::vector<Food> &foodArray);
+
+	std::optional<int> lookForPrey(std::vector<Blob> &blobArray);
+
+	std::optional<int> lookForPredator(std::vector<Blob> &blobArray);
+
+	std::optional<int> tryToEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray);
 
 	void mutate();
 
 	std::optional<Blob> tryToReplicate();
+
+	void setStepTarget(double x, double y);
+
+	std::array<double, 2>& getStepTarget();
+
+	void continueStep();
+
+	bool finishedStep();
 };
 
 #endif

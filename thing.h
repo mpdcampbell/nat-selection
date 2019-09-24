@@ -8,22 +8,22 @@
 class Thing //Need better name for parent class
 {
 protected:
-	int m_xPosition;
-	int m_yPosition;
+	double m_xPosition;
+	double m_yPosition;
 	std::string m_name; // Need better way to handle this
 
 public:
 	Thing();
 
-	Thing(int x, int y, std::string name);
+	Thing(double x, double y, std::string name);
 
-	int getXPosition();
-
-
-	int getYPosition();
+	double getXPosition();
 
 
-	void setPosition(int x, int y);
+	double getYPosition();
+
+
+	void setPosition(double x, double y);
 
 
 	std::string getName();

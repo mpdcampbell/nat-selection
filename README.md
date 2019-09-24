@@ -16,15 +16,21 @@ This is a recreation of the natural selection simulation demonstrated in a [yout
 </p>
 
 <p align="center">
+<<<<<<< HEAD
  <img src="/examples/mapSize8_60fps.gif" alt="" title="Simulation with mapSize of 8 (64 grid spaces)" width="440"  />
  <img src="/examples/test.png" alt="" title="" width ="200" />
  <img src="/examples/mapSize30_60fps.gif" alt="" title="Simulation with mapSize of 30 (900 grid spaces)" width="342" /><br \>
+=======
+ <img src="/examples/mapSize8_60fps.gif" alt="" title="Simulation with mapSize of 8 (64 grid spaces)" width="417"  />
+ <img src="/examples/test.png" alt="" title="" width ="200" />
+ <img src="/examples/mapSize25_60fps.gif" alt="" title="Simulation with mapSize of 25 (125 grid spaces)" width="342" /><br \>
+>>>>>>> timeSteps
 </p>
 
 ### **Simulation Rules** 
 The simulation creates a squared grid map, with "blob" creatures living at the edges, and randomly populates it with food. Each day the blob creatures leave home to hunt for food. If a blob eats one food object and makes it home, it will survive to the next day. If a blob eats two "food" and makes it home then they reproduce asexually. Each blob has three traits to help it hunt food:
  - Size  - A blob can eat another blob so long as the prey is 20% smaller than it.
- - Speed - The number of grid spaces or "steps" it can take at once.
+ - Speed - How quickly a blob moves between grid spaces.
  - Sense - The radius of grid spaces around it that a blob can see. 
  
 However, each of these traits has an energy cost. A blob starts each day with an equal amount of energy and each step taken has an energy cost, where *cost = size<sup>3</sup>speed<sup>2</sup>+sense*. When a blob reproduces, there is mutation chance that one or more of the child's traits will be increased or decreased in value relative to the parent. As the population grows and competition increases, blobs with less preferable traits die out, and the population evolves towards optimal traits for that environment.

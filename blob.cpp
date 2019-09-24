@@ -9,12 +9,12 @@
 extern int g_mutationProb{ 10 };
 
 Blob::Blob()
-	: m_nativeEnergy{ 1800.0 }, m_size{ 3.0 }, m_speed{ 3.0 }, m_sense{ 3.0 }, m_birthday{ 0 }
+	: m_nativeEnergy{ 1800.0 }, m_size{ 3.0 }, m_speed{ 3.0 }, m_sense{ 3.0 }, m_mapSize{ 8 }
 {
 }
 
 Blob::Blob(double nativeEnergy, double size, double speed, double sense)
-	: m_nativeEnergy{ nativeEnergy }, m_size{ size }, m_speed{ speed }, m_sense{ sense }
+	: m_nativeEnergy{ nativeEnergy }, m_size{ size }, m_speed{ speed }, m_sense{ sense }, m_mapSize{ 8 }
 {
 }
 
@@ -108,22 +108,26 @@ void Blob::sleep()
 South and West are -ve (cartesian)*/
 void Blob::stepNorth()
 {
-	++m_yPosition;
+	double y{ m_yPosition + 1.0 };
+	setStepTarget(m_xPosition, y);
 }
 
 void Blob::stepSouth()
 {
-	--m_yPosition;
+	double y{ m_yPosition - 1.0 };
+	setStepTarget(m_xPosition, y);
 }
 
 void Blob::stepEast()
 {
-	++m_xPosition;
+	double x{ m_xPosition + 1.0 };
+	setStepTarget(x, m_yPosition);
 }
 
 void Blob::stepWest()
 {
-	--m_xPosition;
+	double x{ m_xPosition - 1.0 };
+	setStepTarget(x, m_yPosition);
 }
 
 void Blob::randomStep()
@@ -132,26 +136,26 @@ void Blob::randomStep()
 	specifically pointers to functions inside Blob class, 
 	that take no inputs and return void*/
 	std::vector<void(Blob::*)()> compass;
-
+	double d_mapSize{ static_cast<double>(m_mapSize) };
 	// if the blob isn't against the east boundary
-	if (m_xPosition < m_mapSize)
+	if (m_xPosition < d_mapSize-1.0)
 	{
 		//add a function pointer to the array
 		//pointing to address of stepEast
 		compass.push_back(&Blob::stepEast);
 	}
 	// if the blob isn't against the West boundary
-	 if (m_xPosition > 1)
+	 if (m_xPosition >= 2.0)
 	{
 		compass.push_back(&Blob::stepWest);
 	}
 	// if the blob isn't against the North boundary
-	if (m_yPosition < m_mapSize)
+	if (m_yPosition < d_mapSize-1.0)
 	{
 		compass.push_back(&Blob::stepNorth);
 	}
 	// if the blob isn't against the South boundary
-	 if (m_yPosition > 1)
+	 if (m_yPosition >= 2.0)
 	{
 		compass.push_back(&Blob::stepSouth);
 	}
@@ -163,12 +167,12 @@ void Blob::randomStep()
 void Blob::stepEastOrWest()
 {
 	std::vector<void(Blob::*)()> compass;
-
-	if (m_xPosition < m_mapSize)
+	double d_mapSize{ static_cast<double>(m_mapSize) };
+	if (m_xPosition < d_mapSize-1.0)
 	{
 		compass.push_back(&Blob::stepEast);
 	}
-	if (m_xPosition > 1)
+	if (m_xPosition >= 2.0)
 	{
 		compass.push_back(&Blob::stepWest);
 	}
@@ -178,95 +182,107 @@ void Blob::stepEastOrWest()
 
 void Blob::stepNorthOrSouth()
 {
-	int num{ getRandomNumber(0, 1) };
-	if (num)
+	std::vector<void(Blob::*)()> compass;
+	double d_mapSize{ static_cast<double>(m_mapSize) };
+	if (m_yPosition < d_mapSize-1.0)
 	{
-		++m_yPosition;
+		compass.push_back(&Blob::stepNorth);
 	}
-	else
+	if (m_yPosition >= 2.0)
 	{
-		--m_yPosition;
+		compass.push_back(&Blob::stepSouth);
 	}
+	int num{ getRandomNumber(1, (static_cast<int>(compass.size()))) };
+	(this->*compass[num - 1])();
 }
 
 void Blob::stepTowards(Thing &thing)
 {
-	int xdif = thing.getXPosition() - m_xPosition;
-	int ydif = thing.getYPosition() - m_yPosition;
+	double xdif = thing.getXPosition() - m_xPosition;
+	double ydif = thing.getYPosition() - m_yPosition;
+	double xTarget{ m_xPosition };
+	double yTarget{ m_yPosition };
+	
 	(std::abs(xdif) > std::abs(ydif)) ?
-		(m_xPosition += xdif / std::abs(xdif)) : 
-		(m_yPosition += ydif / std::abs(ydif));
+		(xTarget += (xdif / std::abs(xdif))) : 
+		(yTarget += (ydif / std::abs(ydif)));
+
+	setStepTarget(xTarget, yTarget);
 }
 
 void Blob::stepAway(Thing &thing)
 {
-	int xdif = thing.getXPosition() - m_xPosition;
-	int ydif = thing.getYPosition() - m_yPosition;
+	double xdif = thing.getXPosition() - m_xPosition;
+	double ydif = thing.getYPosition() - m_yPosition;
 
+	double xTarget{ m_xPosition };
+	double yTarget{ m_yPosition };
 	/* Blobs at Home that want to run from predators, 
 	can run but only within the boundaries.*/
-	if (atHome())
+
+	if (m_xPosition < 1.0 || m_xPosition > m_mapSize)
 	{
-		if (m_xPosition == 0 || m_xPosition >= m_mapSize + 1)
+		if (m_yPosition < 1.0 || m_yPosition > m_mapSize)
 		{
-			if (m_yPosition == 0 || m_yPosition >= m_mapSize + 1)
-			{
-				//if in one of the corners of home area
-				randomStep();
-			}
-			else
-			{
-				/*If ydiff = 0 then Thing is on same row, so step North 
-				or South is equally good. Otherwise increase distance to 
-				pred, staying within column*/
-				(ydif == 0) ? (stepNorthOrSouth()) :
-					(m_yPosition -= ydif / std::abs(ydif));
-			}
+			//if in corner of map area
+			randomStep();
 		}
-		else if (m_yPosition == 0 || m_yPosition >= m_mapSize + 1)
+		else
 		{
+			/*If ydiff = 0 then Thing is on same row, so step North 
+			or South is equally good. Otherwise increase distance to 
+			pred, staying within column*/
+			(ydif == 0.0) ? (stepNorthOrSouth()) :
+				(yTarget -= ydif / std::abs(ydif));
+		}
+	}
+	else if (m_yPosition < 1.0 || m_yPosition > m_mapSize)
+	{
 			/*If xdiff = 0 then Thing is on same column, so step West
 			or East is equally good. Otherwise increase distance to 
 			pred, staying within row*/
-			(xdif == 0) ? (stepEastOrWest()) :
-				(m_xPosition -= xdif / std::abs(xdif));
-		}
+		(xdif == 0) ? (stepEastOrWest()) :
+			(xTarget -= xdif / std::abs(xdif));
 	}
+
 	else
 	{
-		if (ydif == 0 && xdif == 0)
+		if (ydif == 0.0 && xdif == 0.0)
 		{
 			randomStep();
 		}
 		else
 		{
-			/*Blobs want to run from predator in general, movement not as restricted*/
+			/*Blobs want to run from predator in general, 
+			movement not as restricted*/
 			(std::abs(xdif) > std::abs(ydif)) ?
-				(m_xPosition -= xdif / std::abs(xdif)) :
-				(m_yPosition -= ydif / std::abs(ydif));
+				(xTarget -= xdif / std::abs(xdif)) :
+				(yTarget -= ydif / std::abs(ydif));
 		}
 	}
-}
-
-bool Blob::atFood(Food &food)
-{
-	if (m_xPosition == food.getXPosition() &&
-		m_yPosition == food.getYPosition())
+	if (xTarget != m_xPosition || yTarget != m_yPosition)
 	{
-		return true;
+		setStepTarget(xTarget, yTarget);
 	}
-	return false;
 }
 
-std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray)
+double Blob::distToObject(Thing &object)
+{
+	double xdif = object.getXPosition() - m_xPosition;
+	double ydif = object.getYPosition() - m_yPosition;
+	double distAway{ std::abs(xdif) + std::abs(ydif) };
+	return distAway;
+}
+
+void Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Food> &foodArray)
 {
 	std::optional<int> predOpt = lookForPredator(blobArray);
 	std::optional<int> foodOpt = lookForFood(foodArray);
 	std::optional<int> preyOpt = lookForPrey(blobArray);
 	//guaranteed larger than any dist to object on map
-	int foodDist{ m_mapSize * 10 }; 
-	int preyDist{ m_mapSize * 10 };
-	int predDist{ m_mapSize * 10 };
+	double foodDist( m_mapSize * 10.0 );
+	double preyDist( m_mapSize * 10.0 );
+	double predDist( m_mapSize * 10.0 );
 
 	if (foodOpt.has_value())
 	{
@@ -287,31 +303,20 @@ std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Foo
 	else if (!foodOpt.has_value() && !preyOpt.has_value())
 	{
 		searchPattern();
-		return std::nullopt;
+		return;
 	}
-	
-	if (foodDist == 0) //if ontop of food
+
+	//Start ontop of food / prey
+	if (foodDist == 0.0 || preyDist == 0.0)
 	{
-		//erase that food element
-		auto it = foodArray.begin();
-		foodArray.erase(it + foodOpt.value());
-		setFoodEaten(getFoodEaten() + 1);
-		return std::nullopt;
-	}
-	
-	if (preyDist == 0) //if ontop of prey
-	{
-		auto it = blobArray.begin();
-		//erase that blob element
-		blobArray.erase(it + preyOpt.value());
-		setFoodEaten(getFoodEaten() + 1);
-		return preyOpt.value();
+		setStepTarget(m_xPosition, m_yPosition);
+		return;
 	}
 
 	if (predDist < ((foodDist < preyDist) ? foodDist : preyDist))
 	{
 		stepAway(blobArray[predOpt.value()]);
-		return std::nullopt;
+		return;
 	}
 
 	if (predDist > ((foodDist < preyDist) ? foodDist : preyDist))
@@ -319,7 +324,7 @@ std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Foo
 		(foodDist < preyDist) ?
 			stepTowards(foodArray[foodOpt.value()]) :
 			stepTowards(blobArray[preyOpt.value()]);
-		return std::nullopt;
+		return;
 	}
 
 	if (predDist == ((foodDist < preyDist) ? foodDist : preyDist))
@@ -334,51 +339,68 @@ std::optional<int> Blob::huntOrRun(std::vector<Blob> &blobArray, std::vector<Foo
 		{
 			stepAway(blobArray[predOpt.value()]);
 		}
-		return std::nullopt;
+		return;
 	}
 	std::cout << "\nShould be impossible to reach here\n";
+	return;
+}
+
+std::optional<int> Blob::tryToEat(std::vector<Blob> &blobArray, std::vector<Food> &foodArray)
+{
+	std::optional<int> foodOpt = lookForFood(foodArray);
+	std::optional<int> preyOpt = lookForPrey(blobArray);
+
+	if (foodOpt.has_value())
+	{
+		int foodElement{ foodOpt.value() };
+		double foodDist = distToObject(foodArray[foodElement]);
+		if (foodDist == 0.0) 
+		{
+			//erase that food element
+			auto it = foodArray.begin();
+			foodArray.erase(it + foodOpt.value());
+			setFoodEaten(getFoodEaten() + 1);
+			return std::nullopt;
+		}
+	}
+	if (preyOpt.has_value())
+	{
+		int preyElement{ preyOpt.value() };
+		double preyDist = distToObject(blobArray[preyElement]);
+		if (preyDist == 0.0)
+		{
+			auto it = blobArray.begin();
+			//erase that blob element
+			blobArray.erase(it + preyOpt.value());
+			setFoodEaten(getFoodEaten() + 1);
+			return preyOpt.value();
+		}
+	}
+
+	//If neither dist are 0.0
 	return std::nullopt;
 }
 
-int Blob::distToObject(Thing &object)
-{
-	int xdif = object.getXPosition() - m_xPosition;
-	int ydif = object.getYPosition() - m_yPosition;
-	int distAway{ std::abs(xdif) + std::abs(ydif) };
-	return distAway;
-}
-
-/* Lots of repetition here. Bound to be a smarter way.*/
 std::optional<int> Blob::lookForFood(std::vector<Food> &foodArray)
 {
-	int dist = 10 * m_mapSize;
+	double dist = 10 * m_mapSize;
 	int element;
 	bool foundFood = false;
 
-	//for every piece of food
 	int length{ static_cast<int>(foodArray.size()) };
 	for (int i = 0; i < length; ++i)
 	{
-		/*search the sense area around the blobs position to see if that food
-		is within it. With sense as a double, the rounding down of int x means
-		there is increased energetic cost (cost is a double) for every increase in sense
-		but only an evolutionary advantage when sense increases by a whole unit. int x has
-		to stay int because the tile spaces are in integers.*/
-		for (int x(m_xPosition - m_sense); x <= (m_xPosition + m_sense); ++x)
+		double xPos{ foodArray[i].getXPosition() };
+		double yPos{ foodArray[i].getYPosition() };
+		if ((m_xPosition - m_sense) <= xPos && xPos <= (m_xPosition + m_sense))
 		{
-			if (x == foodArray[i].getXPosition())
+			if ((m_yPosition - m_sense) <= yPos && yPos <= (m_yPosition + m_sense))
 			{
-				for (int y(m_yPosition - m_sense); y <= (m_yPosition + m_sense); ++y)
+				if (distToObject(foodArray[i]) < dist)
 				{
-					if (y == foodArray[i].getYPosition())
-					{
-						if (distToObject(foodArray[i]) < dist)
-						{
-							foundFood = true;
-							dist = distToObject(foodArray[i]);
-							element = i;
-						}
-					}
+					foundFood = true;
+					dist = distToObject(foodArray[i]);
+					element = i;
 				}
 			}
 		}
@@ -395,37 +417,27 @@ std::optional<int> Blob::lookForFood(std::vector<Food> &foodArray)
 
 std::optional<int> Blob::lookForPrey(std::vector<Blob> &blobArray)
 {
-	int dist = 10 * m_mapSize;
+	double dist = 10 * m_mapSize;
 	int element;
 	bool foundPrey = false;
 
 	int length{ static_cast<int>(blobArray.size()) };
 	for (int i = 0; i < length; ++i)
 	{
-		/*is blob is 80% or less of my size and isn't at home then it is legitimate prey.
-		Let us see if it falls within my sense radius (i.e. can I see it)*/
+		/*if blob is 80% or less of size and isn't at home then it is legitimate prey.*/
 		if (blobArray[i].getSize() <= (0.8*m_size) && !(blobArray[i].atHome()))
 		{
-			/*search the sense area around the blobs position to see if that food
-			is within it. With sense as a double, the rounding down of int x means
-			there is increased energetic cost (cost is a double) for every increase in sense
-			but only an evolutionary advantage when sense increases by a whole unit. int x has
-			to stay int because the tile spaces are in integers.*/
-			for (int x(m_xPosition - m_sense); x <= (m_xPosition + m_sense); ++x)
+			double xPos{ blobArray[i].getXPosition() };
+			double yPos{ blobArray[i].getYPosition() };
+			if ((m_xPosition - m_sense) <= xPos && xPos <= (m_xPosition + m_sense))
 			{
-				if (x == blobArray[i].getXPosition())
+				if ((m_yPosition - m_sense) <= yPos && yPos <= (m_yPosition + m_sense))
 				{
-					for (int y(m_yPosition - m_sense); y <= (m_yPosition + m_sense); ++y)
-						{
-						if (y == blobArray[i].getYPosition())
-						{
-							if (distToObject(blobArray[i]) < dist)
-							{
-								foundPrey = true;
-								dist = distToObject(blobArray[i]);
-								element = i;
-							}
-						}
+					if (distToObject(blobArray[i]) < dist)
+					{
+						foundPrey = true;
+						dist = distToObject(blobArray[i]);
+						element = i;
 					}
 				}
 			}
@@ -444,35 +456,29 @@ std::optional<int> Blob::lookForPrey(std::vector<Blob> &blobArray)
 
 std::optional<int> Blob::lookForPredator(std::vector<Blob> &blobArray)
 {
-	int dist = 10 * m_mapSize;
+	double dist = 10 * m_mapSize;
 	int element;
 	bool foundPred = false;
 
-	//for every piece of food
 	int length{ static_cast<int>(blobArray.size()) };
 	for (int i = 0; i < length; ++i)
 	{
 		if ((0.8*blobArray[i].getSize()) >= m_size && !blobArray[i].atHome())
 		{
-			/*search the sense area around the blobs position to see if that food
-			is within it. With sense as a double, the rounding down of int x means
-			there is increased energetic cost (cost is a double) for every increase in sense
-			but only an evolutionary advantage when sense increases by a whole unit. int x has
-			to stay int because the tile spaces are in integers.*/
-			for (int x(m_xPosition - m_sense); x <= (m_xPosition + m_sense); ++x)
+			//Ignore predators that have ran out of energy
+			if (blobArray[i].getEnergy() >= blobArray[i].getCost())
 			{
-				if (x == blobArray[i].getXPosition())
+				double xPos{ blobArray[i].getXPosition() };
+				double yPos{ blobArray[i].getYPosition() };
+				if ((m_xPosition - m_sense) <= xPos && xPos <= (m_xPosition + m_sense))
 				{
-					for (int y(m_yPosition - m_sense); y <= (m_yPosition + m_sense); ++y)
+					if ((m_yPosition - m_sense) <= yPos && yPos <= (m_yPosition + m_sense))
 					{
-						if (y == blobArray[i].getYPosition())
+						if (distToObject(blobArray[i]) < dist)
 						{
-							if (distToObject(blobArray[i]) < dist)
-							{
-								foundPred = true;
-								dist = distToObject(blobArray[i]);
-								element = i;
-							}
+							foundPred = true;
+							dist = distToObject(blobArray[i]);
+							element = i;
 						}
 					}
 				}
@@ -491,18 +497,16 @@ std::optional<int> Blob::lookForPredator(std::vector<Blob> &blobArray)
 
 bool Blob::atHome()
 {
-	if (m_xPosition == 0 || m_xPosition >= m_mapSize + 1)
+	if (m_xPosition < 1.0 || m_xPosition > (m_mapSize) )
 	{
 		return true;
 	}
-	if (m_yPosition == 0 || m_yPosition >= m_mapSize + 1)
+	if (m_yPosition < 1.0 || m_yPosition > (m_mapSize) )
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	
+	return false;
 }
 
 void Blob::goHome()
@@ -514,21 +518,23 @@ void Blob::goHome()
 	}
 	else
 	{
-		/*find which coord is furthest from the midpoint
-		and thus closest to edge, and step in that direction*/
-		int xdif = m_xPosition - (m_mapSize / 2);
-		int ydif = m_yPosition - (m_mapSize / 2);
-		if (xdif == ydif) //centre diagonal
+		double xdif = m_xPosition - (m_mapSize / 2.0);
+		double ydif = m_yPosition - (m_mapSize / 2.0);
+		double xTarget{ m_xPosition };
+		double yTarget{ m_yPosition };
+		//centre diagonal
+		if (xdif == ydif) 
 		{
-			(m_yPosition >= m_mapSize / 2) ?
-				(++m_yPosition) : (--m_yPosition);
+			(yTarget >= m_mapSize / 2.0) ?
+				(++yTarget) : (--yTarget);
 		}
 		else
 		{
 			(std::abs(xdif) > std::abs(ydif)) ?
-				(m_xPosition += xdif / std::abs(xdif)) : 
-				(m_yPosition += ydif / std::abs(ydif));
+				(xTarget += xdif / std::abs(xdif)) : 
+				(yTarget += ydif / std::abs(ydif));
 		}
+		setStepTarget(xTarget, yTarget);
 	}
 }
 
@@ -539,49 +545,59 @@ void Blob::searchPattern()
 		randomStep();
 		return;
 	}
-	if (m_xPosition % 2 == 0)
+
+	int x{ static_cast<int>(m_xPosition) };
+	if (x % 2 == 0)
 	{
-		if (m_yPosition <= 1 + static_cast<int>(m_sense))
+		if (m_yPosition <= 1.0 + m_sense)
 		{
-			stepEastOrWest();
-		} 
-		else
-		{
-			if (m_name % 2 == 0)
+			if (m_xPosition <= 1.0 + m_sense)
 			{
-				--m_yPosition;
+				stepEast();
+			}
+			else if (m_xPosition >= static_cast<double>(m_mapSize) - m_sense)
+			{
+				stepWest();
 			}
 			else
 			{
-				++m_yPosition;
+				stepEastOrWest();
 			}
+		} 
+		else
+		{
+			stepSouth();
 		}
 	}
 	else
 	{
-		if (m_yPosition >= m_mapSize - static_cast<int>(m_sense))
+		if (m_yPosition >= static_cast<double>(m_mapSize) - m_sense)
 		{
-			stepEastOrWest();
-		}
-		else
-		{
-			if (m_name % 2 == 0)
+			if (m_xPosition <= 1.0 + m_sense)
 			{
-				++m_yPosition;
+				stepEast();
+			}
+			else if (m_xPosition >= static_cast<double>(m_mapSize) - m_sense)
+			{
+				stepWest();
 			}
 			else
 			{
-				--m_yPosition;
+				stepEastOrWest();
 			}
+		}
+		else
+		{
+			stepNorth();
 		}
 	}
 }
 
-int Blob::distToEdge()
+double Blob::distToEdge()
 {
 	double mid( (m_mapSize + 1.0) / 2.0 );
-	int xSteps, ySteps;
-	int dist;
+	double xSteps, ySteps;
+	double dist;
 	xSteps = mid - std::abs(m_xPosition - mid);
 	ySteps = mid - std::abs(m_yPosition - mid);
 	(xSteps >= ySteps) ? dist = ySteps : dist = xSteps;
@@ -596,14 +612,11 @@ bool Blob::hasSurplusStamina()
 		return false; 
 	}
 
-	double dist{ static_cast<double>(distToEdge()) };
+	double dist{ distToEdge() };
 	/*if remaining stamina is greater than that needed to get to
 	closest edge then blob has spare stamina. The +1 is for case
 	where blob has spare stamina then steps	one away, reducing its
-	stamina by one and increasing the needed stamina by one.
-	This effective +2 means without +1 error margin blob would
-	make the wrong choice, and be unable to get home
-	*/
+	stamina by one and increasing the needed stamina by one.*/
 	if ((m_energy / getCost()) <= dist + 1.0)
 	{
 		return false;
@@ -615,54 +628,58 @@ void Blob::mutate()
 {
 	int prob{ 200/ g_mutationProb};
 	int num{ getRandomNumber(1, prob) };
+
 	if (num == 1) 
 	{
 		int mult = getRandomNumber(1, 10);
-		double x{ (getSpeed()) + (mult / 10.0) };
+		double x{ m_speed + (mult / 10.0) };
 		setSpeed(x);
 	}
 	else if (num == 2)
 	{
-		if (getSpeed() > 0)
+		int mult = getRandomNumber(1, 10);
+		double x{ m_speed - (mult / 10.0) };
+		if (x < 0.1)
 		{
-			int mult = getRandomNumber(1, 10);
-			double x{ (getSpeed()) - (mult / 10.0) };
-			setSpeed(x);
+			x = 0.1;
 		}
+		setSpeed(x);
 	}
 
 	num = getRandomNumber(1, prob);
 	if (num == 1) 
 	{
 		int mult = getRandomNumber(1, 10);
-		double x{ (getSense()) + (mult / 10.0) };
+		double x{ m_sense + (mult / 10.0) };
 		setSense(x);
 	}
 	else if (num == 2)
 	{
-		if (getSense() > 0)
+		int mult = getRandomNumber(1, 10);
+		double x{ m_sense - (mult / 10.0) };
+		if (x < 0.1)
 		{
-			int mult = getRandomNumber(1, 10);
-			double x{ (getSense()) - (mult / 10.0) };
-			setSense(x);
+			x = 0.1;
 		}
+		setSense(x);
 	}
 
 	num = getRandomNumber(1, prob);
 	if (num == 1) 
 	{
 		int mult = getRandomNumber(1, 10);
-		double x{ (getSize()) + (mult / 10.0) };
+		double x{ m_size + (mult / 10.0) };
 		setSize(x);
 	}
 	else if (num == 2)
 	{
-		if (getSize() > 0)
+		int mult = getRandomNumber(1, 10);
+		double x{ m_size - (mult / 10.0) };
+		if (x < 0.1)
 		{
-			int mult = getRandomNumber(1, 10);
-			double x{ (getSize()) - (mult / 10.0) };
-			setSize(x);
+			x = 0.1;
 		}
+		setSize(x);
 	}
 }
 
@@ -678,5 +695,80 @@ std::optional<Blob> Blob::tryToReplicate()
 	else
 	{
 		return std::nullopt;
+	}
+}
+
+void Blob::setStepTarget(double x, double y)
+{
+	m_stepTarget = { x, y };
+}
+
+std::array<double, 2>& Blob::getStepTarget()
+{
+	return m_stepTarget;
+}
+
+bool Blob::finishedStep()
+{
+	double xdiff = m_stepTarget[0] - m_xPosition;
+	double ydiff = m_stepTarget[1] - m_yPosition;
+	if (xdiff == 0.0 && ydiff == 0.0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void Blob::continueStep()
+{
+	double xdiff = m_stepTarget[0] - m_xPosition;
+	double ydiff = m_stepTarget[1] - m_yPosition;
+	double speedMax = 20.0;
+	double babySteps{ speedMax / m_speed };
+	double distPerTime = (1.0 / babySteps);
+
+	if (xdiff != 0)
+	{
+		if (xdiff > 0)
+		{
+			m_xPosition += distPerTime;
+			if (m_xPosition >= m_stepTarget[0])
+			{
+				setPosition(m_stepTarget[0], m_stepTarget[1]);
+				reduceEnergy();
+			}
+		}
+		if (xdiff < 0)
+		{
+			m_xPosition -= distPerTime;
+			if (m_xPosition <= m_stepTarget[0])
+			{
+				setPosition(m_stepTarget[0], m_stepTarget[1]);
+				reduceEnergy();
+			}
+		}
+	}
+
+	if (ydiff != 0)
+	{
+		if (ydiff > 0)
+		{
+			m_yPosition += distPerTime;
+			if (m_yPosition >= m_stepTarget[1])
+			{
+				setPosition(m_stepTarget[0], m_stepTarget[1]);
+				reduceEnergy();
+			}
+		}
+		if (ydiff < 0)
+		{
+			m_yPosition -= distPerTime;
+			if (m_yPosition <= m_stepTarget[1])
+			{
+				setPosition(m_stepTarget[0], m_stepTarget[1]);
+				reduceEnergy();
+			}
+		}
 	}
 }
