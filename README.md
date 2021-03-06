@@ -2,11 +2,9 @@
 This is a recreation of the natural selection simulation demonstrated in a [youtube video](https://www.youtube.com/watch?v=0ZGbIKd0XrM), where creatures compete and their traits evolve depending on environment pressure. Primer has his own [github repository](https://github.com/Helpsypoo/primer), but none of his code was used here. The idea was to copy the simulation "rules" set out in the video and independently recreate it in C++. The simulation runs in its entirety offscreen, then [gnuplot](http://www.gnuplot.info/) is used (via the [gnuplot-iostream api](https://github.com/dstahlke/gnuplot-iostream)) to produce plots of how the population number and the creature traits changed. Additionally, a 2D animation of the simulation is displayed, using the [olcPixelGameEngine library](https://github.com/OneLoneCoder/olcPixelGameEngine), as each generated frame is passed to [ffmpeg](https://ffmpeg.org/) to create a local video. 
 
 #### **Example Graphs**
-
- <img align="left" src="/examples/AverageChange.png" alt="Average change plot for a single simulation" title="Average change plot for a single simulation" width="400"  /> 
- <img align="right" src="/examples/AverageChange_10runs.png" alt="Average change plot for 10 repeat simulation runs" title="Average change plot for 10 repeat simulation runs" width="400" />
-
 <p align="center">
+<img align="center" src="/examples/AverageChange.png" alt="Average change plot for a single simulation" title="Average change plot for a single simulation" width="400"  /> 
+<img align="center" src="/examples/AverageChange_10runs.png" alt="Average change plot for 10 repeat simulation runs" title="Average change plot for 10 repeat simulation runs" width="400" />
 <img align="center" src="/examples/StatDistribution_Sim0.gif" alt="Trait distribution for a given simulation" title="Trait distribution for a given simulation" width="450"><br \>
  </p>
  
